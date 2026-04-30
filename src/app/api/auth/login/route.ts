@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import {
   createSession,
-  setSessionCookie,
   normalizePhoneNumber,
   isValidKoreanPhone,
 } from '@/lib/auth';
+import { setSessionCookie } from '@/lib/session';
 
 export async function POST(request: Request) {
   try {

@@ -1,6 +1,7 @@
 @import '../styles/pixel-fonts.css';
 @import '../styles/tokens.css';
 @import '../styles/character-animations.css';
+@import '../styles/character-select.css';
 
 @tailwind base;
 @tailwind components;

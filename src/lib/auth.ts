@@ -1,12 +1,12 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'dev-secret-change-me-in-production-please-32'
 );
 
-const COOKIE_NAME = 'samg_session';
 const TOKEN_EXPIRY = '30d';
+
+export const SESSION_COOKIE_NAME = 'samg_session';
 
 export interface SessionPayload {
   userId: string;
@@ -33,26 +33,6 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
   } catch {
     return null;
   }
-}
-
-export async function getSession(): Promise<SessionPayload | null> {
-  const token = cookies().get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifySession(token);
-}
-
-export async function setSessionCookie(token: string) {
-  cookies().set(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30,
-  });
-}
-
-export async function clearSessionCookie() {
-  cookies().delete(COOKIE_NAME);
 }
 
 export function normalizePhoneNumber(raw: string): string {

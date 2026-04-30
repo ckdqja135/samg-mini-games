@@ -44,8 +44,17 @@ npm run dev
 - [x] Phase 1-3: MobileFrame + 스플래시 화면
 - [x] Phase 1-4: Prisma 스키마 + DB 클라이언트
 - [x] Phase 1-5: 닉네임+전화번호 인증 (SMS 없이)
-- [ ] Phase 2: 캐릭터 시스템 (스프라이트 + 애니메이션 + 능력치)
-- [ ] Phase 3: 게임 선택 + 랭킹
+- [x] Phase 2-1: 스프라이트 메타데이터 + 능력치 정의
+- [x] Phase 2-2: CharacterSprite (CSS) + CharacterRenderer (Canvas)
+- [x] Phase 2-3: 콤보/점수 계산기 + gameStore
+- [x] Phase 2-4: CharacterSelect 화면 (`/games/[gameId]`)
+- [x] Phase 3-1: 랭킹 + 점수 API (사용자별 베스트 기준 TOP N)
+- [x] Phase 3-2: GameCard + RankingList 컴포넌트
+- [x] Phase 3-3: 게임 목록 화면 (TOP 5 + 내 최고기록 표시)
+- [x] Phase 4-1: 구름 점프 타입/구름 생성기 (4종 + 별 아이템)
+- [x] Phase 4-2: Canvas 게임 엔진 (점프 물리, 충돌, 카메라 스크롤, 좌우 래핑, 입력)
+- [x] Phase 4-3: AbilityEffectOverlay + GameHUD
+- [x] Phase 4-4: /games/[gameId]/play + /result placeholder
 - [ ] Phase 4: 게임 플레이 (구름 점프)
 - [ ] Phase 5: 결과 화면 + 점수 등록
 

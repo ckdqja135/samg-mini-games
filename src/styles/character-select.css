@@ -1,0 +1,156 @@
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.character-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 3px solid transparent;
+  border-radius: 16px;
+  padding: 10px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+}
+
+.character-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.character-card.selected {
+  border-color: var(--char-color, #FF8FB1);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    color-mix(in srgb, var(--char-color, #FF8FB1) 18%, white)
+  );
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--char-color, #FF8FB1) 35%, transparent);
+  transform: translateY(-5px);
+}
+
+.character-card .char-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--text-dark);
+  font-family: 'DungGeunMo', monospace;
+  margin-top: 2px;
+}
+
+.character-card .ability-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 360px) {
+  .character-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.selected-preview {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 24px;
+  padding: 20px 16px;
+  backdrop-filter: blur(10px);
+}
+
+.preview-name {
+  font-size: 22px;
+  font-weight: bold;
+  font-family: 'DungGeunMo', monospace;
+  background: linear-gradient(135deg, var(--char-color, #FF8FB1), #6B4F8C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.preview-desc {
+  margin-top: 4px;
+  color: var(--text-light);
+  font-size: 13px;
+}
+
+.ability-card {
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--char-color, #FF8FB1) 14%, white),
+    rgba(255, 255, 255, 0.92)
+  );
+  border: 2px solid var(--char-color, #FF8FB1);
+  border-radius: 16px;
+  text-align: left;
+}
+
+.ability-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ability-icon-large {
+  font-size: 24px;
+}
+
+.ability-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--text-dark);
+  font-family: 'DungGeunMo', monospace;
+}
+
+.ability-desc {
+  font-size: 12.5px;
+  color: var(--text-dark);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.ability-tags {
+  display: flex;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  font-weight: bold;
+}
+
+.tag-combo {
+  color: #E66B92;
+}
+.tag-time {
+  color: #4A9EFF;
+}
+.tag-event {
+  color: #E89A2D;
+}
+.tag-passive {
+  color: #5BA876;
+}
