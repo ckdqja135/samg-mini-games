@@ -1,0 +1,25 @@
+@import '../styles/pixel-fonts.css';
+@import '../styles/tokens.css';
+@import '../styles/character-animations.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-br from-[#FF8FB1] to-[#FFB5D0] text-white font-bold px-6 py-3 rounded-cute-lg shadow-cute relative transition-all active:translate-y-1 active:shadow-none;
+  }
+
+  .btn-secondary {
+    @apply bg-gradient-to-br from-[#C5B6E8] to-[#E0D5F5] text-white font-bold px-6 py-3 rounded-cute-lg shadow-cute-purple relative transition-all active:translate-y-1 active:shadow-none;
+  }
+
+  .input-cute {
+    @apply w-full px-4 py-3 rounded-cute bg-white/80 border-2 border-soft-pink focus:border-primary-pink focus:outline-none text-text-dark placeholder:text-text-light;
+  }
+
+  .card-cute {
+    @apply bg-white/70 backdrop-blur-sm rounded-cute-lg p-6 shadow-lg;
+  }
+}

@@ -1,0 +1,57 @@
+:root {
+  --primary-pink: #FF8FB1;
+  --soft-pink: #FFD6E5;
+  --cream: #FFF5F8;
+  --lavender: #E8D5F2;
+
+  --mint: #B5E8D5;
+  --sky: #C5E5FF;
+  --yellow: #FFE89A;
+
+  --text-dark: #4A3B52;
+  --text-light: #8B7B92;
+
+  --button-primary: linear-gradient(135deg, #FF8FB1, #FFB5D0);
+  --button-shadow: 0 4px 0 #E66B92;
+
+  --bg-gradient: linear-gradient(135deg, #FFE0EC 0%, #F0E1F7 50%, #DCE9FF 100%);
+
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-dark);
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  background: none;
+  color: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+canvas {
+  image-rendering: pixelated;
+}

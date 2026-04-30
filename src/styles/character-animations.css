@@ -1,0 +1,94 @@
+@keyframes character-idle {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.02, 0.98);
+  }
+}
+
+@keyframes character-walk {
+  0%, 100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(3deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+
+@keyframes character-jump {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  20% {
+    transform: translateY(-2px) scale(1.1, 0.9);
+  }
+  60% {
+    transform: translateY(-30px) scale(0.95, 1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@keyframes character-celebrate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-15px) rotate(-10deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  75% {
+    transform: translateY(-15px) rotate(10deg) scale(1.1);
+  }
+}
+
+@keyframes character-hurt {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-5px) rotate(-5deg); }
+  20% { transform: translateX(5px) rotate(5deg); }
+  30% { transform: translateX(-5px) rotate(-5deg); }
+  40% { transform: translateX(5px) rotate(5deg); }
+  50% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+.character-sprite {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+
+.character-sprite.anim-idle {
+  animation: character-idle 1.8s ease-in-out infinite;
+}
+
+.character-sprite.anim-walk {
+  animation: character-walk 0.5s ease-in-out infinite;
+}
+
+.character-sprite.anim-jump {
+  animation: character-jump 0.6s ease-out;
+}
+
+.character-sprite.anim-celebrate {
+  animation: character-celebrate 0.8s ease-in-out infinite;
+}
+
+.character-sprite.anim-hurt {
+  animation: character-hurt 0.5s ease-out;
+}
+
+.character-sprite.flip-x {
+  transform: scaleX(-1);
+}

@@ -1,0 +1,58 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import {
+  createSession,
+  setSessionCookie,
+  normalizePhoneNumber,
+  isValidKoreanPhone,
+} from '@/lib/auth';
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const phoneNumber = normalizePhoneNumber(body.phoneNumber || '');
+    const nickname = (body.nickname || '').trim();
+
+    if (!isValidKoreanPhone(phoneNumber)) {
+      return NextResponse.json(
+        { error: '올바른 전화번호를 입력해주세요 (010-XXXX-XXXX)' },
+        { status: 400 }
+      );
+    }
+
+    if (nickname.length < 2 || nickname.length > 10) {
+      return NextResponse.json(
+        { error: '닉네임은 2~10자로 입력해주세요' },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.upsert({
+      where: { phoneNumber },
+      update: { nickname },
+      create: { phoneNumber, nickname },
+    });
+
+    const token = await createSession({
+      userId: user.id,
+      phoneNumber: user.phoneNumber,
+      nickname: user.nickname,
+    });
+
+    await setSessionCookie(token);
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        phoneNumber: user.phoneNumber,
+        nickname: user.nickname,
+      },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { error: '로그인 중 오류가 발생했습니다' },
+      { status: 500 }
+    );
+  }
+}
