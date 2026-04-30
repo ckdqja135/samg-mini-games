@@ -18,12 +18,16 @@ function rankBadge(rank: number): string {
 export function RankingList({
   ranking,
   myUserId,
-  emptyMessage = '아직 기록이 없어요. 첫 도전자가 되어보세요!',
+  emptyMessage = '첫 도전자가 되어보세요! 🏆',
 }: RankingListProps) {
   if (ranking.length === 0) {
     return (
-      <div className="text-center text-text-light text-sm py-4 font-pixel">
-        {emptyMessage}
+      <div className="text-center py-6 px-3">
+        <div className="text-3xl mb-2">🌸</div>
+        <p className="text-sm text-text-dark font-pixel mb-1">아직 기록이 없어요</p>
+        <p className="text-xs text-text-light font-pixel">
+          {emptyMessage}
+        </p>
       </div>
     );
   }

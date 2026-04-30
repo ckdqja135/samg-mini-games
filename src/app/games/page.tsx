@@ -6,6 +6,8 @@ import { MobileFrame } from '@/components/layout/MobileFrame';
 import { GameCard } from '@/components/game/GameCard';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { SettingsToggles } from '@/components/ui/SettingsToggles';
+import { DailyMissionsCard } from '@/components/game/DailyMissionsCard';
+import { AttendancePopup } from '@/components/game/AttendancePopup';
 
 export default async function GamesPage() {
   const session = await getSession();
@@ -32,7 +34,12 @@ export default async function GamesPage() {
           <LogoutButton />
         </div>
 
-        <div className="card-cute flex items-center gap-3 py-3">
+        <AttendancePopup />
+
+        <Link
+          href="/profile"
+          className="card-cute flex items-center gap-3 py-3 hover:bg-white/90 transition-colors"
+        >
           <div className="text-3xl">👋</div>
           <div className="flex-1">
             <p className="text-xs text-text-light">반가워요!</p>
@@ -40,7 +47,10 @@ export default async function GamesPage() {
               {session.nickname}
             </p>
           </div>
-        </div>
+          <span className="text-text-light text-sm">내 기록 →</span>
+        </Link>
+
+        <DailyMissionsCard />
 
         <div className="flex flex-col gap-5">
           {games.map((game) => (

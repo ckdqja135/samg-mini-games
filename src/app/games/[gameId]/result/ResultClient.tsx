@@ -14,6 +14,8 @@ import type {
 } from '@/types/score';
 import { audio } from '@/lib/audio';
 import { vibrate } from '@/lib/haptic';
+import { ShareButton } from '@/components/game/ShareButton';
+import { CHARACTER_SPRITES } from '@/data/characterSprite';
 
 interface ResultClientProps {
   gameId: string;
@@ -62,6 +64,7 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
               score: result.score,
               maxCombo: result.maxCombo,
               abilityActivations: result.abilityActivations,
+              durationMs: result.durationMs,
             }),
           }),
           fetch('/api/auth/me', { cache: 'no-store' }),
@@ -225,6 +228,13 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
       )}
 
       <div className="mt-auto w-full flex flex-col gap-2 pt-2">
+        <ShareButton
+          gameName={gameName}
+          score={result.score}
+          characterName={
+            CHARACTER_SPRITES.find((c) => c.id === result.characterId)?.name
+          }
+        />
         <Link href={`/games/${gameId}`} className="block">
           <CuteButton variant="primary" fullWidth withSparkle>
             🔄 다시하기

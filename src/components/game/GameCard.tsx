@@ -6,6 +6,8 @@ import { CuteButton } from '@/components/ui/CuteButton';
 import { SparkleEffect } from '@/components/ui/SparkleEffect';
 import { RankingList } from './RankingList';
 import type { GameRankingResponse } from '@/types/score';
+import { GAME_RECOMMENDATIONS } from '@/data/gameRecommendations';
+import { CHARACTER_SPRITES } from '@/data/characterSprite';
 
 interface GameCardProps {
   game: {
@@ -48,10 +50,39 @@ export function GameCard({ game, myUserId }: GameCardProps) {
       </div>
 
       <h2 className="font-pixel text-lg text-text-dark mb-1">{game.name}</h2>
-      <p className="text-sm text-text-light mb-4">{game.description}</p>
+      <p className="text-sm text-text-light mb-3">{game.description}</p>
+
+      {(() => {
+        const rec = GAME_RECOMMENDATIONS[game.id];
+        if (!rec) return null;
+        const char = CHARACTER_SPRITES.find((c) => c.id === rec.primary);
+        if (!char) return null;
+        return (
+          <div
+            className="mb-4 px-3 py-2 rounded-cute border-2 text-xs flex items-start gap-2"
+            style={{
+              borderColor: char.color,
+              background: `linear-gradient(135deg, ${char.color}22, #FFFFFF80)`,
+            }}
+          >
+            <span className="font-pixel text-text-dark whitespace-nowrap">
+              💡 추천: <span style={{ color: char.color }}>{char.name}</span>
+            </span>
+            <span className="text-text-light leading-snug">{rec.reason}</span>
+          </div>
+        );
+      })()}
 
       <div className="mb-4">
-        <h3 className="font-pixel text-sm text-text-dark mb-2">🏆 TOP 5 랭킹</h3>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-pixel text-sm text-text-dark">🏆 TOP 5 랭킹</h3>
+          <Link
+            href={`/games/${game.id}/ranking`}
+            className="text-xs text-text-light hover:text-primary-pink font-pixel"
+          >
+            전체 →
+          </Link>
+        </div>
         {loading ? (
           <div className="text-center text-text-light text-xs py-4 font-pixel">
             랭킹 불러오는 중...

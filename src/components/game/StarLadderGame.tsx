@@ -8,6 +8,9 @@ import { aabbHits, nextId, randRange } from '@/lib/gameUtils';
 import type { GameOverResult } from '@/types/game';
 import { AbilityEffectOverlay } from './AbilityEffectOverlay';
 import { GameHUD } from './GameHUD';
+import { PauseModal } from './PauseModal';
+import { TutorialOverlay } from './TutorialOverlay';
+import { AbilityIndicator } from './AbilityIndicator';
 import { audio } from '@/lib/audio';
 import { vibrate } from '@/lib/haptic';
 
@@ -72,6 +75,8 @@ export function StarLadderGame({ gameId, characterId }: Props) {
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(3);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
 
   useEffect(() => {
     setCharacter(characterId);
@@ -134,6 +139,10 @@ export function StarLadderGame({ gameId, characterId }: Props) {
     const loop = () => {
       const s = stateRef.current;
       if (s.isOver) return;
+      if (pausedRef.current) {
+        animFrameRef.current = requestAnimationFrame(loop);
+        return;
+      }
       frameRef.current++;
 
       // 사다리 등반 효과 (배경 스크롤)
@@ -351,7 +360,13 @@ export function StarLadderGame({ gameId, characterId }: Props) {
 
   return (
     <div className="relative w-full h-full flex flex-col items-center bg-cream select-none">
-      <GameHUD level={hudLevel} onMenu={() => router.push('/games')} />
+      <GameHUD
+        level={hudLevel}
+        onMenu={() => {
+          pausedRef.current = true;
+          setPaused(true);
+        }}
+      />
       <div className="relative mt-12" onTouchStart={handleTap} onMouseDown={handleTap}>
         <canvas
           ref={canvasRef}
@@ -361,6 +376,16 @@ export function StarLadderGame({ gameId, characterId }: Props) {
           style={{ width: `${CFG.W}px`, height: `${CFG.H}px`, maxWidth: '100%', touchAction: 'none' }}
         />
         <AbilityEffectOverlay />
+        <PauseModal
+          open={paused}
+          onResume={() => {
+            pausedRef.current = false;
+            setPaused(false);
+          }}
+          gameName="별빛 사다리"
+        />
+        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <AbilityIndicator />
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
             <div className="font-pixel text-7xl text-white drop-shadow-[3px_3px_0_#FF8FB1]">

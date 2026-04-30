@@ -8,6 +8,7 @@ import {
   CHARACTER_ABILITIES,
   getTriggerTypeLabel,
 } from '@/data/characterAbilities';
+import { GAME_RECOMMENDATIONS } from '@/data/gameRecommendations';
 import { CharacterSprite } from './CharacterSprite';
 import { CuteButton } from '@/components/ui/CuteButton';
 import { SparkleEffect } from '@/components/ui/SparkleEffect';
@@ -48,6 +49,28 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
       <h2 className="text-center font-pixel text-lg text-primary-pink">
         함께할 핑을 골라줘! 💖
       </h2>
+
+      {(() => {
+        const rec = GAME_RECOMMENDATIONS[gameId];
+        if (!rec) return null;
+        const char = CHARACTER_SPRITES.find((c) => c.id === rec.primary);
+        if (!char) return null;
+        return (
+          <div
+            className="px-3 py-2 mx-2 rounded-cute text-xs font-pixel text-center"
+            style={{
+              border: `2px solid ${char.color}`,
+              background: `linear-gradient(135deg, ${char.color}22, #FFFFFF80)`,
+            }}
+          >
+            💡 이 게임엔{' '}
+            <span style={{ color: char.color, fontWeight: 'bold' }}>
+              {char.name}
+            </span>
+            {' '}추천!
+          </div>
+        );
+      })()}
 
       <div className="character-grid px-2">
         {CHARACTER_SPRITES.map((char) => {

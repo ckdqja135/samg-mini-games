@@ -18,7 +18,7 @@ export function GameHUD({ level, onMenu }: GameHUDProps) {
           onClick={onMenu}
           className="font-pixel text-xs text-text-dark bg-white/80 px-3 py-1.5 rounded-cute pointer-events-auto"
         >
-          MENU
+          ⏸ MENU
         </button>
 
         <div className="text-right font-pixel">
@@ -27,11 +27,8 @@ export function GameHUD({ level, onMenu }: GameHUDProps) {
         </div>
       </div>
 
-      {/* 가운데 상단 점수 배지 */}
       <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-        <div
-          className="px-5 py-1.5 rounded-full bg-white/85 backdrop-blur-sm shadow-[0_3px_0_rgba(230,107,146,0.4)] border-2 border-primary-pink text-center font-pixel"
-        >
+        <div className="px-5 py-1.5 rounded-full bg-white/85 backdrop-blur-sm shadow-[0_3px_0_rgba(230,107,146,0.4)] border-2 border-primary-pink text-center font-pixel">
           <div className="text-[10px] text-text-light leading-none">SCORE</div>
           <div
             className="text-2xl leading-tight tabular-nums"

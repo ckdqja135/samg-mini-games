@@ -22,6 +22,9 @@ import type {
 } from '@/types/cloudJump';
 import { AbilityEffectOverlay } from './AbilityEffectOverlay';
 import { GameHUD } from './GameHUD';
+import { PauseModal } from './PauseModal';
+import { TutorialOverlay } from './TutorialOverlay';
+import { AbilityIndicator } from './AbilityIndicator';
 import { audio } from '@/lib/audio';
 import { vibrate } from '@/lib/haptic';
 
@@ -106,6 +109,8 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(3);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
 
   // 게임오버 처리는 effect 안에서 정의되며 ref로 최신값 접근
   const gameOverRef = useRef<() => void>(() => {});
@@ -197,6 +202,10 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
       const time = performance.now();
       const s = stateRef.current;
       if (s.isGameOver) return;
+      if (pausedRef.current) {
+        animFrameRef.current = requestAnimationFrame(loop);
+        return;
+      }
 
       // 입력: 항상 한 방향으로 일정 속도 이동, 토글로 방향 전환
       s.player.vx = directionRef.current === 'right' ? MOVE_SPEED : -MOVE_SPEED;
@@ -552,7 +561,13 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
 
   return (
     <div className="relative w-full h-full flex flex-col items-center bg-cream select-none">
-      <GameHUD level={hudLevel} onMenu={() => router.push('/games')} />
+      <GameHUD
+        level={hudLevel}
+        onMenu={() => {
+          pausedRef.current = true;
+          setPaused(true);
+        }}
+      />
 
       <div
         className="relative mt-12"
@@ -573,6 +588,18 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
         />
 
         <AbilityEffectOverlay />
+
+        <PauseModal
+          open={paused}
+          onResume={() => {
+            pausedRef.current = false;
+            setPaused(false);
+          }}
+          gameName="구름 점프"
+        />
+
+        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <AbilityIndicator />
 
         {/* 카운트다운 오버레이 */}
         {countdown !== null && (

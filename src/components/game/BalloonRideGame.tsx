@@ -22,6 +22,9 @@ import type {
 import type { GameOverResult } from '@/types/cloudJump';
 import { AbilityEffectOverlay } from './AbilityEffectOverlay';
 import { GameHUD } from './GameHUD';
+import { PauseModal } from './PauseModal';
+import { TutorialOverlay } from './TutorialOverlay';
+import { AbilityIndicator } from './AbilityIndicator';
 import { audio } from '@/lib/audio';
 import { vibrate } from '@/lib/haptic';
 
@@ -106,6 +109,8 @@ export function BalloonRideGame({
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(3);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
 
   const gameOverRef = useRef<() => void>(() => {});
 
@@ -191,6 +196,10 @@ export function BalloonRideGame({
       const time = performance.now();
       const s = stateRef.current;
       if (s.isGameOver) return;
+      if (pausedRef.current) {
+        animFrameRef.current = requestAnimationFrame(loop);
+        return;
+      }
       frameCountRef.current++;
 
       // 물리
@@ -567,7 +576,13 @@ export function BalloonRideGame({
 
   return (
     <div className="relative w-full h-full flex flex-col items-center bg-cream select-none">
-      <GameHUD level={hudLevel} onMenu={() => router.push('/games')} />
+      <GameHUD
+        level={hudLevel}
+        onMenu={() => {
+          pausedRef.current = true;
+          setPaused(true);
+        }}
+      />
 
       <div
         className="relative mt-12"
@@ -588,6 +603,16 @@ export function BalloonRideGame({
         />
 
         <AbilityEffectOverlay />
+        <PauseModal
+          open={paused}
+          onResume={() => {
+            pausedRef.current = false;
+            setPaused(false);
+          }}
+          gameName="풍선 타기"
+        />
+        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <AbilityIndicator />
 
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
