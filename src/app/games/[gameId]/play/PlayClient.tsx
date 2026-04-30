@@ -4,12 +4,28 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGamePlayStore } from '@/store/gameStore';
 import { CloudJumpGame } from '@/components/game/CloudJumpGame';
+import { BalloonRideGame } from '@/components/game/BalloonRideGame';
+import { WaterDodgeGame } from '@/components/game/WaterDodgeGame';
+import { CakeCatchGame } from '@/components/game/CakeCatchGame';
+import { BalloonPopGame } from '@/components/game/BalloonPopGame';
+import { StarLadderGame } from '@/components/game/StarLadderGame';
+import { FruitRiverGame } from '@/components/game/FruitRiverGame';
 import { CuteButton } from '@/components/ui/CuteButton';
 
 interface PlayClientProps {
   gameId: string;
   gameName: string;
 }
+
+const SUPPORTED_GAMES = new Set([
+  'cloud-jump',
+  'balloon-ride',
+  'water-dodge',
+  'cake-catch',
+  'balloon-pop',
+  'star-ladder',
+  'fruit-river',
+]);
 
 export function PlayClient({ gameId, gameName }: PlayClientProps) {
   const router = useRouter();
@@ -51,7 +67,7 @@ export function PlayClient({ gameId, gameName }: PlayClientProps) {
     );
   }
 
-  if (gameId !== 'cloud-jump') {
+  if (!SUPPORTED_GAMES.has(gameId)) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center px-6 gap-3 text-center">
         <div className="text-5xl">🚧</div>
@@ -71,7 +87,27 @@ export function PlayClient({ gameId, gameName }: PlayClientProps) {
 
   return (
     <div className="flex-1 flex items-center justify-center py-2">
-      <CloudJumpGame gameId={gameId} characterId={selectedCharacter} />
+      {gameId === 'cloud-jump' && (
+        <CloudJumpGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'balloon-ride' && (
+        <BalloonRideGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'water-dodge' && (
+        <WaterDodgeGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'cake-catch' && (
+        <CakeCatchGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'balloon-pop' && (
+        <BalloonPopGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'star-ladder' && (
+        <StarLadderGame gameId={gameId} characterId={selectedCharacter} />
+      )}
+      {gameId === 'fruit-river' && (
+        <FruitRiverGame gameId={gameId} characterId={selectedCharacter} />
+      )}
     </div>
   );
 }

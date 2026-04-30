@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { MobileFrame } from '@/components/layout/MobileFrame';
 import { GameCard } from '@/components/game/GameCard';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import { SettingsToggles } from '@/components/ui/SettingsToggles';
 
 export default async function GamesPage() {
   const session = await getSession();
@@ -20,13 +21,14 @@ export default async function GamesPage() {
   return (
     <MobileFrame>
       <div className="flex-1 flex flex-col px-6 py-6 gap-5">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <Link href="/" className="text-text-dark text-xl px-1">
             ←
           </Link>
           <h1 className="flex-1 text-center font-pixel text-lg text-text-dark">
             미니게임 선택
           </h1>
+          <SettingsToggles compact />
           <LogoutButton />
         </div>
 

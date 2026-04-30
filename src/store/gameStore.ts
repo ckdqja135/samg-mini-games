@@ -6,6 +6,8 @@ import { calculateScore } from '@/utils/scoreCalculator';
 interface AddScoreOptions {
   isItemBonus?: boolean;
   breaksCombo?: boolean;
+  /** 콤보/능력치/효과 메시지를 건드리지 않고 점수만 추가 (예: 거리 점수) */
+  passive?: boolean;
 }
 
 interface GamePlayState {
@@ -37,6 +39,11 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
   addScore: (baseScore, options = {}) => {
     const state = get();
     if (!state.selectedCharacter) return;
+
+    if (options.passive) {
+      set({ currentScore: state.currentScore + Math.max(0, Math.floor(baseScore)) });
+      return;
+    }
 
     const now = performance.now();
     const newComboCount = options.breaksCombo ? 0 : state.comboCount + 1;

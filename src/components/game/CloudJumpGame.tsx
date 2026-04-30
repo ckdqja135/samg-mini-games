@@ -22,6 +22,8 @@ import type {
 } from '@/types/cloudJump';
 import { AbilityEffectOverlay } from './AbilityEffectOverlay';
 import { GameHUD } from './GameHUD';
+import { audio } from '@/lib/audio';
+import { vibrate } from '@/lib/haptic';
 
 interface CloudJumpGameProps {
   gameId: string;
@@ -117,10 +119,19 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
 
     renderer.preload().then(() => setReady(true)).catch(() => setReady(true));
 
+    // 첫 사용자 입력 시 오디오 컨텍스트 깨우기 (모바일 자동재생 정책)
+    const wakeAudio = () => {
+      void audio.ensure();
+    };
+    window.addEventListener('pointerdown', wakeAudio, { once: true });
+    window.addEventListener('keydown', wakeAudio, { once: true });
+
     return () => {
       if (animFrameRef.current != null) {
         cancelAnimationFrame(animFrameRef.current);
       }
+      window.removeEventListener('pointerdown', wakeAudio);
+      window.removeEventListener('keydown', wakeAudio);
     };
   }, [characterId, resetGame, setCharacter]);
 
@@ -155,6 +166,9 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
     const handleGameOver = () => {
       if (state.isGameOver) return;
       state.isGameOver = true;
+
+      audio.play('gameOver');
+      vibrate('fail');
 
       const store = useGamePlayStore.getState();
       const result: GameOverResult = {
@@ -228,7 +242,34 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
           if (cloud.type === 'breakable') baseScore = 25;
           if (cloud.type === 'moving') baseScore = 35;
 
+          const prevCombo = useGamePlayStore.getState().comboCount;
           addScore(baseScore, { isItemBonus });
+
+          // SFX + 햅틱
+          if (cloud.type === 'trampoline') {
+            audio.play('trampoline');
+            vibrate('medium');
+          } else if (cloud.type === 'star') {
+            audio.play('star');
+            vibrate('success');
+          } else if (cloud.type === 'breakable') {
+            audio.play('breakable');
+            vibrate('light');
+          } else {
+            audio.play('jump');
+            vibrate('light');
+          }
+
+          // 콤보 임계점 (5/10/20...) 시 추가 SFX/햅틱
+          const newCombo = useGamePlayStore.getState().comboCount;
+          if (
+            newCombo > prevCombo &&
+            newCombo >= 5 &&
+            (newCombo % 5 === 0 || newCombo % 10 === 0)
+          ) {
+            audio.play('combo');
+            vibrate('combo');
+          }
 
           if (cloud.type === 'breakable') {
             cloud.broken = true;
@@ -269,6 +310,8 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
         ) {
           fruit.collected = true;
           addScore(getFruitScore(fruit.type), { isItemBonus: true });
+          audio.play('fruit');
+          vibrate('light');
         }
       }
 
@@ -318,17 +361,22 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
     };
   }, [ready, countdown, addScore, characterId, gameId, router]);
 
+  const bgGradientRef = useRef<CanvasGradient | null>(null);
+
   const drawScene = (
     ctx: CanvasRenderingContext2D,
     s: GameState,
     time: number
   ) => {
-    // 배경
-    const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
-    grad.addColorStop(0, '#FFE0EC');
-    grad.addColorStop(0.5, '#F0E1F7');
-    grad.addColorStop(1, '#DCE9FF');
-    ctx.fillStyle = grad;
+    // 배경 그라데이션은 한 번만 만들어 재사용
+    if (!bgGradientRef.current) {
+      const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+      grad.addColorStop(0, '#FFE0EC');
+      grad.addColorStop(0.5, '#F0E1F7');
+      grad.addColorStop(1, '#DCE9FF');
+      bgGradientRef.current = grad;
+    }
+    ctx.fillStyle = bgGradientRef.current;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // 배경 별/하트 (시차 스크롤)
@@ -479,6 +527,8 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
 
   const toggleDirection = () => {
     directionRef.current = directionRef.current === 'right' ? 'left' : 'right';
+    audio.play('select');
+    vibrate('light');
   };
 
   const handleTap = (e: React.TouchEvent | React.MouseEvent) => {

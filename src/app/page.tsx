@@ -2,12 +2,15 @@ import Link from 'next/link';
 import { MobileFrame } from '@/components/layout/MobileFrame';
 import { CuteButton } from '@/components/ui/CuteButton';
 import { SparkleEffect } from '@/components/ui/SparkleEffect';
+import { SettingsToggles } from '@/components/ui/SettingsToggles';
 
 export default function SplashPage() {
   return (
     <MobileFrame>
       <div className="flex-1 flex flex-col items-center justify-between px-6 py-12 relative">
         <SparkleEffect count={8} />
+
+        <SettingsToggles className="absolute top-4 right-4 z-20" compact />
 
         <div className="w-full text-center mt-8 relative z-10">
           <h1 className="font-pixel text-3xl text-primary-pink drop-shadow-[2px_2px_0_rgba(255,255,255,0.9)]">

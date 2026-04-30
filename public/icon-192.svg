@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD6E5"/>
+      <stop offset="50%" stop-color="#E8D5F2"/>
+      <stop offset="100%" stop-color="#C5E5FF"/>
+    </linearGradient>
+    <radialGradient id="heart" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFB5D0"/>
+      <stop offset="100%" stop-color="#FF8FB1"/>
+    </radialGradient>
+  </defs>
+  <rect width="192" height="192" rx="44" fill="url(#bg)"/>
+  <path d="M96 152 C 60 124, 36 100, 36 76 C 36 60, 50 48, 64 48 C 78 48, 88 56, 96 68 C 104 56, 114 48, 128 48 C 142 48, 156 60, 156 76 C 156 100, 132 124, 96 152 Z" fill="url(#heart)" stroke="#E66B92" stroke-width="3"/>
+  <circle cx="76" cy="74" r="4" fill="#FFFFFF"/>
+  <circle cx="116" cy="74" r="4" fill="#FFFFFF"/>
+  <text x="96" y="180" text-anchor="middle" font-family="DungGeunMo, monospace" font-size="14" font-weight="bold" fill="#4A3B52" opacity="0.4">핑</text>
+</svg>

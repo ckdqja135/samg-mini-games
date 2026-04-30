@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD6E5"/>
+      <stop offset="50%" stop-color="#E8D5F2"/>
+      <stop offset="100%" stop-color="#C5E5FF"/>
+    </linearGradient>
+    <radialGradient id="heart" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFB5D0"/>
+      <stop offset="100%" stop-color="#FF8FB1"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <g transform="translate(0,-20)">
+    <path d="M256 408 C 160 332, 96 268, 96 200 C 96 156, 132 124, 168 124 C 204 124, 232 144, 256 176 C 280 144, 308 124, 344 124 C 380 124, 416 156, 416 200 C 416 268, 352 332, 256 408 Z" fill="url(#heart)" stroke="#E66B92" stroke-width="8"/>
+    <circle cx="204" cy="196" r="11" fill="#FFFFFF"/>
+    <circle cx="308" cy="196" r="11" fill="#FFFFFF"/>
+    <path d="M236 232 Q 256 248 276 232" stroke="#FFFFFF" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="256" y="476" text-anchor="middle" font-family="DungGeunMo, monospace" font-size="36" font-weight="bold" fill="#4A3B52" opacity="0.5">미니게임천국</text>
+</svg>
