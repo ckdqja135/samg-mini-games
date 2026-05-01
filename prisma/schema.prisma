@@ -12,10 +12,13 @@ model User {
   phoneNumber String   @unique
   nickname    String
   birthDate   DateTime?
+  isAdmin     Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   scores      Score[]
+  challenges  DailyChallenge[]
+  attendances Attendance[]
 }
 
 model Game {
@@ -42,4 +45,35 @@ model Score {
   game               Game     @relation(fields: [gameId], references: [id])
 
   @@index([gameId, score])
+  @@index([userId, playedAt])
+}
+
+model DailyChallenge {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String   // YYYY-MM-DD (KST)
+  type      String   // 'play_games' | 'total_score' | 'max_combo'
+  target    Int
+  progress  Int      @default(0)
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date, type])
+  @@index([userId, date])
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String   // YYYY-MM-DD (KST)
+  streak    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
