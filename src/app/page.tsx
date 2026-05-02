@@ -13,11 +13,11 @@ export default function SplashPage() {
         <SettingsToggles className="absolute top-4 right-4 z-20" compact />
 
         <div className="w-full text-center mt-8 relative z-10">
-          <h1 className="font-pixel text-3xl text-primary-pink drop-shadow-[2px_2px_0_rgba(255,255,255,0.9)]">
-            ✨ 미니게임천국 ✨
+          <h1 className="font-sans font-extrabold text-4xl text-primary-pink drop-shadow-[2px_2px_0_rgba(255,255,255,0.9)] tracking-tight">
+            티니게임천국
           </h1>
-          <p className="mt-3 text-text-dark text-sm">
-            마이핑 컴패니언과 함께하는
+          <p className="mt-3 text-text-dark text-sm font-sans font-medium">
+            귀여운 미니핑이 함께해요
           </p>
         </div>
 
@@ -34,18 +34,21 @@ export default function SplashPage() {
         </div>
 
         <div className="w-full text-center relative z-10">
-          <p className="font-pixel text-text-dark text-base mb-6 leading-relaxed">
-            &ldquo;핑들과 함께하는<br />미니게임 천국!&rdquo;
-          </p>
+          <div className="flex flex-col gap-3">
+            <Link href="/auth/login" className="block">
+              <CuteButton variant="primary" fullWidth>
+                로그인
+              </CuteButton>
+            </Link>
+            <Link href="/auth/signup" className="block">
+              <CuteButton variant="secondary" fullWidth>
+                회원가입
+              </CuteButton>
+            </Link>
+          </div>
 
-          <Link href="/auth/login" className="block">
-            <CuteButton variant="primary" fullWidth withSparkle>
-              📱 시작하기
-            </CuteButton>
-          </Link>
-
-          <p className="mt-4 text-text-light text-xs">
-            전화번호와 닉네임만 있으면 OK!
+          <p className="mt-4 text-text-light text-xs font-sans">
+            전화번호와 닉네임만 있으면 OK
           </p>
         </div>
       </div>

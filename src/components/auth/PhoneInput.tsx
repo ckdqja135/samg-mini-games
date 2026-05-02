@@ -30,7 +30,7 @@ export function PhoneInput({
       placeholder={placeholder}
       maxLength={13}
       disabled={disabled}
-      className="input-cute text-center font-pixel text-lg"
+      className="input-cute text-center font-sans font-semibold text-lg tracking-wide tabular-nums"
       autoComplete="tel"
     />
   );

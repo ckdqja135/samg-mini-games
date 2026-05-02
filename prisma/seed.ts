@@ -17,8 +17,8 @@ const GAMES = [
   },
   {
     id: 'water-dodge',
-    name: '풍뿌리기 피하기',
-    description: '쏟아지는 물줄기를 점프로 피해보세요!',
+    name: '물줄기 피하기',
+    description: '쏟아지는 물줄기를 좌우로 피해보세요!',
     thumbnail: '/asset/thumbnails/water-dodge.png',
   },
   {

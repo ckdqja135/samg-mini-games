@@ -21,22 +21,23 @@ interface Props {
 
 const CFG = {
   W: 375,
-  H: 600,
-  GROUND_Y: 510,
+  H: 700,
+  GROUND_Y: 610,
   PLAYER_W: 50,
   PLAYER_H: 60,
-  WALK_SPEED: 2.6,
-  JUMP_VY: -11,
-  GRAVITY: 0.55,
-  DROP_INTERVAL_BASE: 50,
-  DROP_INTERVAL_MIN: 22,
-  DROP_FALL_BASE: 3.0,
-  DROP_FALL_MAX: 5.5,
+  WALK_SPEED: 1.3,
+  DROP_INTERVAL_BASE: 90,
+  DROP_INTERVAL_MIN: 50,
+  DROP_FALL_BASE: 1.6,
+  DROP_FALL_MAX: 2.8,
   ITEM_SIZE: 32,
-  MAX_MISS: 3,
+  FRUIT_SIZE: 28,
+  FRUIT_SPAWN_INTERVAL: 320,
+  FRUIT_FALL_BASE: 1.3,
+  FRUIT_FALL_MAX: 2.2,
 };
 
-const ITEM_DEFS = {
+const FALLING_DEFS = {
   cake: { emoji: '🍰', score: 50, weight: 28, danger: false },
   donut: { emoji: '🍩', score: 30, weight: 30, danger: false },
   candy: { emoji: '🍬', score: 20, weight: 25, danger: false },
@@ -44,13 +45,29 @@ const ITEM_DEFS = {
   bomb: { emoji: '💣', score: 0, weight: 10, danger: true },
 };
 
+const FRUIT_DEFS = {
+  strawberry: { emoji: '🍓', score: 40, weight: 50 },
+  cherry: { emoji: '🍒', score: 80, weight: 25 },
+  lemon: { emoji: '🍋', score: 120, weight: 15 },
+  grape: { emoji: '🍇', score: 220, weight: 10 },
+};
+
 interface FallingItem {
   id: number;
   x: number;
   y: number;
   vy: number;
-  type: keyof typeof ITEM_DEFS;
+  type: keyof typeof FALLING_DEFS;
   caught: boolean;
+}
+
+interface FallingFruit {
+  id: number;
+  x: number;
+  y: number;
+  vy: number;
+  type: keyof typeof FRUIT_DEFS;
+  collected: boolean;
 }
 
 export function CakeCatchGame({ gameId, characterId }: Props) {
@@ -65,12 +82,11 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
   const stateRef = useRef({
     px: CFG.W / 2 - CFG.PLAYER_W / 2,
     py: CFG.GROUND_Y - CFG.PLAYER_H,
-    vy: 0,
-    onGround: true,
-    dir: 1,
+    dir: 1, // 1=right, -1=left
     items: [] as FallingItem[],
+    fruits: [] as FallingFruit[],
     nextSpawn: 50,
-    miss: 0,
+    nextFruitSpawn: 200,
     distance: 0,
     isOver: false,
     level: 1,
@@ -81,11 +97,11 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
   const setCharacter = useGamePlayStore((s) => s.setCharacter);
 
   const [hudLevel, setHudLevel] = useState(1);
-  const [missDisplay, setMissDisplay] = useState(0);
   const [ready, setReady] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   useEffect(() => {
     setCharacter(characterId);
@@ -104,17 +120,17 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
   }, [characterId, resetGame, setCharacter]);
 
   useEffect(() => {
-    if (!ready || countdown === null) return;
+    if (!ready || countdown === null || tutorialOpen) return;
     if (countdown <= 0) {
       setCountdown(null);
       return;
     }
     const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -154,7 +170,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
       }
       frameRef.current++;
 
-      // 자동 좌우 왕복
+      // 자동 좌우 이동 (벽에 닿으면 자동 반전)
       s.px += s.dir * CFG.WALK_SPEED;
       if (s.px < 8) {
         s.px = 8;
@@ -164,26 +180,20 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
         s.dir = -1;
       }
 
-      // 점프
-      if (!s.onGround) {
-        s.vy += CFG.GRAVITY;
-        s.py += s.vy;
-        if (s.py + CFG.PLAYER_H >= CFG.GROUND_Y) {
-          s.py = CFG.GROUND_Y - CFG.PLAYER_H;
-          s.vy = 0;
-          s.onGround = true;
-        }
-      }
-
-      // 스폰
+      // 떨어지는 디저트/폭탄 스폰 — 시간이 지날수록 폭탄 가중치 증가
       s.nextSpawn--;
       if (s.nextSpawn <= 0) {
-        const type = pickWeighted(ITEM_DEFS) as keyof typeof ITEM_DEFS;
+        const bombBoost = Math.min(60, Math.floor(s.distance / 4));
+        const dynamicDefs = {
+          ...FALLING_DEFS,
+          bomb: { ...FALLING_DEFS.bomb, weight: FALLING_DEFS.bomb.weight + bombBoost },
+        };
+        const type = pickWeighted(dynamicDefs) as keyof typeof FALLING_DEFS;
         s.items.push({
           id: nextId(),
           x: randRange(20, CFG.W - 20 - CFG.ITEM_SIZE),
           y: -CFG.ITEM_SIZE,
-          vy: randRange(CFG.DROP_FALL_BASE, CFG.DROP_FALL_MAX) + s.level * 0.3,
+          vy: randRange(CFG.DROP_FALL_BASE, CFG.DROP_FALL_MAX) + s.level * 0.15,
           type,
           caught: false,
         });
@@ -196,11 +206,10 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
 
       s.items.forEach((it) => (it.y += it.vy));
 
-      // 충돌 + 처리
+      // 떨어지는 아이템 충돌/처리
       for (const it of s.items) {
         if (it.caught) continue;
-        const def = ITEM_DEFS[it.type];
-        // 캐릭터 닿음
+        const def = FALLING_DEFS[it.type];
         if (
           aabbHits(
             s.px,
@@ -221,26 +230,57 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
           addScore(def.score, { isItemBonus: it.type === 'star' });
           audio.play(it.type === 'star' ? 'star' : 'fruit');
           vibrate('light');
-        } else if (it.y > CFG.GROUND_Y - CFG.ITEM_SIZE / 2) {
-          // 바닥에 떨어짐
+        } else if (it.y > CFG.GROUND_Y) {
+          // 바닥 통과 (놓침) → 그냥 사라짐
           it.caught = true;
-          if (!def.danger) {
-            // 디저트 놓침: 콤보 리셋 + miss 증가
-            useGamePlayStore.setState((g) => ({ comboCount: 0 }));
-            s.miss++;
-            setMissDisplay(s.miss);
-            audio.play('breakable');
-            vibrate('medium');
-            if (s.miss >= CFG.MAX_MISS) {
-              handleGameOver();
-              return;
-            }
-          }
         }
       }
       s.items = s.items.filter((it) => !it.caught);
 
-      // 거리 점수
+      // 보너스 과일 (하늘에서 떨어짐)
+      s.nextFruitSpawn--;
+      if (s.nextFruitSpawn <= 0) {
+        const type = pickWeighted(FRUIT_DEFS) as keyof typeof FRUIT_DEFS;
+        s.fruits.push({
+          id: nextId(),
+          x: randRange(12, CFG.W - 12 - CFG.FRUIT_SIZE),
+          y: -CFG.FRUIT_SIZE,
+          vy: randRange(CFG.FRUIT_FALL_BASE, CFG.FRUIT_FALL_MAX) + s.level * 0.12,
+          type,
+          collected: false,
+        });
+        s.nextFruitSpawn = CFG.FRUIT_SPAWN_INTERVAL + Math.floor(Math.random() * 120);
+      }
+
+      s.fruits.forEach((fr) => (fr.y += fr.vy));
+
+      // 보너스 과일 충돌
+      for (const fr of s.fruits) {
+        if (fr.collected) continue;
+        if (
+          aabbHits(
+            s.px,
+            s.py,
+            CFG.PLAYER_W,
+            CFG.PLAYER_H,
+            fr.x,
+            fr.y,
+            CFG.FRUIT_SIZE,
+            CFG.FRUIT_SIZE
+          )
+        ) {
+          fr.collected = true;
+          addScore(FRUIT_DEFS[fr.type].score, { isItemBonus: true });
+          audio.play('fruit');
+          vibrate('light');
+        } else if (fr.y > CFG.GROUND_Y) {
+          // 바닥 통과 (놓침)
+          fr.collected = true;
+        }
+      }
+      s.fruits = s.fruits.filter((fr) => !fr.collected);
+
+      // 거리 점수 + 레벨업
       if (frameRef.current % 30 === 0) {
         s.distance += 1;
         addScore(1, { passive: true });
@@ -259,7 +299,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
     return () => {
       if (animFrameRef.current != null) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -276,7 +316,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
     ctx.fillStyle = bgRef.current;
     ctx.fillRect(0, 0, CFG.W, CFG.H);
 
-    // 바닥 (테이블 느낌)
+    // 바닥
     ctx.fillStyle = '#E8D5F2';
     ctx.fillRect(0, CFG.GROUND_Y, CFG.W, CFG.H - CFG.GROUND_Y);
     ctx.strokeStyle = '#C5B6E8';
@@ -286,26 +326,46 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
     ctx.lineTo(CFG.W, CFG.GROUND_Y);
     ctx.stroke();
 
-    // 떨어지는 아이템
+    // 떨어지는 보너스 과일
+    s.fruits.forEach((fr) => {
+      if (fr.collected) return;
+      const cx = fr.x + CFG.FRUIT_SIZE / 2;
+      const cy = fr.y + CFG.FRUIT_SIZE / 2;
+
+      ctx.save();
+      const glow = ctx.createRadialGradient(cx, cy, 2, cx, cy, CFG.FRUIT_SIZE * 0.9);
+      glow.addColorStop(0, 'rgba(130, 217, 181, 0.55)');
+      glow.addColorStop(1, 'rgba(130, 217, 181, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, CFG.FRUIT_SIZE * 0.9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = `${CFG.FRUIT_SIZE}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(FRUIT_DEFS[fr.type].emoji, cx, cy);
+      ctx.restore();
+    });
+
+    // 떨어지는 디저트/폭탄
     s.items.forEach((it) => {
       if (it.caught) return;
       const cx = it.x + CFG.ITEM_SIZE / 2;
       const cy = it.y + CFG.ITEM_SIZE / 2;
-      const def = ITEM_DEFS[it.type];
+      const def = FALLING_DEFS[it.type];
 
       ctx.save();
       if (!def.danger) {
         const glow = ctx.createRadialGradient(cx, cy, 2, cx, cy, CFG.ITEM_SIZE * 0.9);
-        glow.addColorStop(0, 'rgba(255, 232, 154, 0.5)');
+        glow.addColorStop(0, 'rgba(255, 232, 154, 0.55)');
         glow.addColorStop(1, 'rgba(255, 232, 154, 0)');
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(cx, cy, CFG.ITEM_SIZE * 0.9, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // 폭탄 위험 표시 (빨간 후광)
         const glow = ctx.createRadialGradient(cx, cy, 2, cx, cy, CFG.ITEM_SIZE);
-        glow.addColorStop(0, 'rgba(255, 80, 80, 0.4)');
+        glow.addColorStop(0, 'rgba(255, 80, 80, 0.45)');
         glow.addColorStop(1, 'rgba(255, 80, 80, 0)');
         ctx.fillStyle = glow;
         ctx.beginPath();
@@ -320,46 +380,36 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
     });
 
     // 캐릭터
-    let anim: 'idle' | 'walk' | 'jump' = 'walk';
-    if (!s.onGround) anim = 'jump';
     rendererRef.current?.draw(
       ctx,
       characterId,
       s.px,
       s.py,
       CFG.PLAYER_H,
-      anim,
+      'walk',
       time,
       s.dir < 0
     );
-
-    // 우상단 miss 표시
-    ctx.font = '14px DungGeunMo, monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#E66B92';
-    ctx.fillText(`놓침 ${s.miss}/${CFG.MAX_MISS}`, CFG.W - 10, 50);
   };
 
-  const tap = () => {
+  const flipDirection = () => {
     const s = stateRef.current;
-    if (s.isOver || !s.onGround) return;
-    s.vy = CFG.JUMP_VY;
-    s.onGround = false;
+    if (s.isOver) return;
+    s.dir = s.dir === 1 ? -1 : 1;
     audio.play('jump');
     vibrate('light');
   };
 
   const handleTap = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    tap();
+    flipDirection();
   };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.code === 'Space' || e.key === ' ') && !e.repeat) {
         e.preventDefault();
-        tap();
+        flipDirection();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -381,7 +431,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
           width={CFG.W}
           height={CFG.H}
           className="rounded-cute-lg shadow-xl bg-white"
-          style={{ width: `${CFG.W}px`, height: `${CFG.H}px`, maxWidth: '100%', touchAction: 'none' }}
+          style={{ width: '100%', maxWidth: `${CFG.W}px`, aspectRatio: `${CFG.W} / ${CFG.H}`, maxHeight: 'calc(100dvh - 110px)', touchAction: 'none' }}
         />
         <AbilityEffectOverlay />
         <PauseModal
@@ -392,7 +442,11 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
           }}
           gameName="케이크 캐치"
         />
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
@@ -403,12 +457,12 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
         )}
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center bg-cream/90 rounded-cute-lg">
-            <p className="font-pixel text-text-dark">준비 중...</p>
+            <p className="font-sans text-text-dark">준비 중...</p>
           </div>
         )}
       </div>
-      <div className="mt-3 text-center text-xs text-text-light font-pixel">
-        탭 / 스페이스바로 점프해서 캐치 — 💣 폭탄은 피하세요!
+      <div className="mt-3 text-center text-base font-sans font-semibold text-text-dark">
+        탭 / 스페이스바로 좌우 방향 전환 — 폭탄은 피하기
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ interface ProfileData {
 const GAME_NAMES: Record<string, string> = {
   'cloud-jump': '구름 점프',
   'balloon-ride': '풍선 타기',
-  'water-dodge': '풍뿌리기 피하기',
+  'water-dodge': '물줄기 피하기',
   'cake-catch': '케이크 캐치',
   'balloon-pop': '하늘 풍선 펑',
   'star-ladder': '별빛 사다리',

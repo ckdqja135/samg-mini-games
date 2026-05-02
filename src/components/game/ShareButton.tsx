@@ -37,7 +37,7 @@ export function ShareButton({ gameName, score, characterName, url }: ShareButton
     // 클립보드 폴백
     try {
       await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
-      setFeedback('📋 클립보드에 복사됐어요!');
+      setFeedback('클립보드에 복사됐어요');
     } catch {
       setFeedback('공유에 실패했어요');
     }
@@ -47,10 +47,10 @@ export function ShareButton({ gameName, score, characterName, url }: ShareButton
   return (
     <div className="relative">
       <CuteButton variant="secondary" fullWidth onClick={handleShare}>
-        📤 점수 공유하기
+        점수 공유하기
       </CuteButton>
       {feedback && (
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-cute bg-text-dark text-white text-xs font-pixel whitespace-nowrap">
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-cute bg-text-dark text-white text-xs font-sans font-semibold whitespace-nowrap">
           {feedback}
         </div>
       )}

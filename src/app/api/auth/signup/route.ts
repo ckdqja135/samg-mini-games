@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const phoneNumber = normalizePhoneNumber(body.phoneNumber || '');
+    const nickname = (body.nickname || '').trim();
 
     if (!isValidKoreanPhone(phoneNumber)) {
       return NextResponse.json(
@@ -19,16 +20,27 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    if (nickname.length < 2 || nickname.length > 10) {
+      return NextResponse.json(
+        { error: '닉네임은 2~10자로 입력해주세요' },
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.user.findUnique({
       where: { phoneNumber },
     });
 
-    if (!user) {
+    if (existing) {
       return NextResponse.json(
-        { error: '가입되지 않은 번호예요. 회원가입을 먼저 해주세요' },
-        { status: 404 }
+        { error: '이미 가입된 번호예요. 로그인을 이용해주세요' },
+        { status: 409 }
       );
     }
+
+    const user = await prisma.user.create({
+      data: { phoneNumber, nickname },
+    });
 
     const token = await createSession({
       userId: user.id,
@@ -46,9 +58,9 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Signup error:', error);
     return NextResponse.json(
-      { error: '로그인 중 오류가 발생했습니다' },
+      { error: '회원가입 중 오류가 발생했습니다' },
       { status: 500 }
     );
   }

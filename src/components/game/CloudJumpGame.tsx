@@ -111,6 +111,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   // 게임오버 처리는 effect 안에서 정의되며 ref로 최신값 접근
   const gameOverRef = useRef<() => void>(() => {});
@@ -143,6 +144,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
   // 카운트다운
   useEffect(() => {
     if (!ready) return;
+    if (tutorialOpen) return;
     if (countdown === null) return;
     if (countdown <= 0) {
       setCountdown(null);
@@ -152,11 +154,11 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
       setCountdown((c) => (c === null ? null : c - 1));
     }, 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   // 게임 루프 시작
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -368,7 +370,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
         cancelAnimationFrame(animFrameRef.current);
       }
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const bgGradientRef = useRef<CanvasGradient | null>(null);
 
@@ -580,9 +582,10 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
           height={CANVAS_HEIGHT}
           className="rounded-cute-lg shadow-xl bg-white"
           style={{
-            width: `${CANVAS_WIDTH}px`,
-            height: `${CANVAS_HEIGHT}px`,
-            maxWidth: '100%',
+            width: '100%',
+            maxWidth: `${CANVAS_WIDTH}px`,
+            aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`,
+            maxHeight: 'calc(100dvh - 110px)',
             touchAction: 'none',
           }}
         />
@@ -598,7 +601,11 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
           gameName="구름 점프"
         />
 
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
 
         {/* 카운트다운 오버레이 */}

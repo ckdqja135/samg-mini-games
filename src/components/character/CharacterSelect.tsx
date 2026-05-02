@@ -9,6 +9,7 @@ import {
   getTriggerTypeLabel,
 } from '@/data/characterAbilities';
 import { GAME_RECOMMENDATIONS } from '@/data/gameRecommendations';
+import { TUTORIALS } from '@/components/game/TutorialOverlay';
 import { CharacterSprite } from './CharacterSprite';
 import { CuteButton } from '@/components/ui/CuteButton';
 import { SparkleEffect } from '@/components/ui/SparkleEffect';
@@ -40,14 +41,14 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
         <Link href="/games" className="text-text-dark text-xl px-2">
           ←
         </Link>
-        <h1 className="flex-1 text-center font-pixel text-base text-text-dark">
+        <h1 className="flex-1 text-center font-sans font-bold text-base text-text-dark tracking-tight">
           {gameName} · 캐릭터 선택
         </h1>
         <div className="w-8" />
       </div>
 
-      <h2 className="text-center font-pixel text-lg text-primary-pink">
-        함께할 핑을 골라줘! 💖
+      <h2 className="text-center font-sans font-bold text-lg text-primary-pink tracking-tight">
+        함께할 캐릭터를 골라주세요
       </h2>
 
       {(() => {
@@ -57,17 +58,47 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
         if (!char) return null;
         return (
           <div
-            className="px-3 py-2 mx-2 rounded-cute text-xs font-pixel text-center"
-            style={{
-              border: `2px solid ${char.color}`,
-              background: `linear-gradient(135deg, ${char.color}22, #FFFFFF80)`,
-            }}
+            className="px-3 py-2 mx-2 rounded-cute text-sm bg-white/95 border-l-4 flex items-center justify-center gap-1.5"
+            style={{ borderLeftColor: char.color }}
           >
-            💡 이 게임엔{' '}
-            <span style={{ color: char.color, fontWeight: 'bold' }}>
+            <span className="text-text-dark font-semibold">이 게임엔</span>
+            <span
+              className="font-bold px-2 py-0.5 rounded-full text-white text-xs"
+              style={{ backgroundColor: char.color }}
+            >
               {char.name}
             </span>
-            {' '}추천!
+            <span className="text-text-dark font-semibold">추천!</span>
+          </div>
+        );
+      })()}
+
+      {(() => {
+        const t = TUTORIALS[gameId];
+        if (!t) return null;
+        return (
+          <div className="mx-2 px-4 py-3 rounded-cute-lg bg-white/95 border-2 border-primary-pink/30">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-base">{t.emoji}</span>
+              <h3 className="font-sans font-bold text-sm text-text-dark tracking-tight">
+                이렇게 플레이해요
+              </h3>
+            </div>
+            <ol className="flex flex-col gap-1.5">
+              {t.steps.map((step, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-[12.5px] text-text-dark/85 leading-snug"
+                >
+                  <span
+                    className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-pink/15 text-primary-pink font-sans font-bold text-[10px] flex items-center justify-center mt-0.5 tabular-nums"
+                  >
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         );
       })()}
@@ -114,7 +145,7 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
             animation="celebrate"
           />
         </div>
-        <h3 className="preview-name">✨ {selected.name} ✨</h3>
+        <h3 className="preview-name">{selected.name}</h3>
         <p className="preview-desc">{selected.description}</p>
 
         <div className="ability-card">
@@ -131,9 +162,9 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
         </div>
       </div>
 
-      <div className="mt-auto pt-2">
-        <CuteButton variant="primary" fullWidth withSparkle onClick={handleStart}>
-          🎮 이 핑이랑 시작!
+      <div className="pt-2">
+        <CuteButton variant="primary" fullWidth onClick={handleStart}>
+          이 캐릭터로 시작
         </CuteButton>
       </div>
     </div>

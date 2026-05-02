@@ -23,7 +23,7 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={busy}
-      className="text-xs font-pixel text-text-light hover:text-primary-pink px-2 py-1 disabled:opacity-50"
+      className="text-xs font-sans font-semibold text-text-light hover:text-primary-pink px-2 py-1 disabled:opacity-50"
       aria-label="로그아웃"
     >
       로그아웃

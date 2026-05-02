@@ -111,6 +111,7 @@ export function BalloonRideGame({
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   const gameOverRef = useRef<() => void>(() => {});
 
@@ -139,6 +140,7 @@ export function BalloonRideGame({
 
   useEffect(() => {
     if (!ready) return;
+    if (tutorialOpen) return;
     if (countdown === null) return;
     if (countdown <= 0) {
       setCountdown(null);
@@ -148,11 +150,11 @@ export function BalloonRideGame({
       setCountdown((c) => (c === null ? null : c - 1));
     }, 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   // 메인 루프
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -332,7 +334,7 @@ export function BalloonRideGame({
         cancelAnimationFrame(animFrameRef.current);
       }
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -595,9 +597,10 @@ export function BalloonRideGame({
           height={CANVAS_HEIGHT}
           className="rounded-cute-lg shadow-xl bg-white"
           style={{
-            width: `${CANVAS_WIDTH}px`,
-            height: `${CANVAS_HEIGHT}px`,
-            maxWidth: '100%',
+            width: '100%',
+            maxWidth: `${CANVAS_WIDTH}px`,
+            aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`,
+            maxHeight: 'calc(100dvh - 110px)',
             touchAction: 'none',
           }}
         />
@@ -611,7 +614,11 @@ export function BalloonRideGame({
           }}
           gameName="풍선 타기"
         />
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
 
         {countdown !== null && (

@@ -22,10 +22,11 @@ export function RankingList({
 }: RankingListProps) {
   if (ranking.length === 0) {
     return (
-      <div className="text-center py-6 px-3">
-        <div className="text-3xl mb-2">🌸</div>
-        <p className="text-sm text-text-dark font-pixel mb-1">아직 기록이 없어요</p>
-        <p className="text-xs text-text-light font-pixel">
+      <div className="text-center py-5 px-3 rounded-cute bg-white/70">
+        <p className="text-sm text-text-dark font-sans font-semibold mb-1">
+          아직 기록이 없어요
+        </p>
+        <p className="text-xs text-text-light">
           {emptyMessage}
         </p>
       </div>

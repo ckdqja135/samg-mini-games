@@ -21,9 +21,9 @@ interface Props {
 
 const CFG = {
   W: 375,
-  H: 600,
+  H: 700,
   PLAYER_X: 375 / 2,
-  PLAYER_Y: 600 / 2,
+  PLAYER_Y: 700 / 2,
   PLAYER_SAFE_R: 38,
   BALLOON_R: 22,
   BALLOON_BASE_SPEED: 0.7,
@@ -32,6 +32,7 @@ const CFG = {
   STAR_RADIUS: 12,
   SPAWN_INTERVAL_BASE: 60,
   SPAWN_INTERVAL_MIN: 22,
+  FIRE_COOLDOWN_MS: 120,
 };
 
 const BALLOON_COLORS = ['#FF8FB1', '#FFE89A', '#B5E8D5', '#C5E5FF', '#E8D5F2'];
@@ -73,6 +74,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
     distance: 0,
     isOver: false,
     level: 1,
+    lastFireAt: 0,
   });
 
   const addScore = useGamePlayStore((s) => s.addScore);
@@ -84,6 +86,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   useEffect(() => {
     setCharacter(characterId);
@@ -102,17 +105,17 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
   }, [characterId, resetGame, setCharacter]);
 
   useEffect(() => {
-    if (!ready || countdown === null) return;
+    if (!ready || countdown === null || tutorialOpen) return;
     if (countdown <= 0) {
       setCountdown(null);
       return;
     }
     const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -277,7 +280,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
     return () => {
       if (animFrameRef.current != null) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -377,36 +380,23 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
     );
   };
 
-  const fireStar = () => {
+  // 좌표를 향해 별 발사 (수동 조준)
+  const fireStarToward = (targetX: number, targetY: number) => {
     const s = stateRef.current;
     if (s.isOver) return;
-    // 가장 가까운 미펑 풍선 찾기
-    let nearest: Balloon | null = null;
-    let nearestDist = Infinity;
-    for (const b of s.balloons) {
-      if (b.popped) continue;
-      const d = distSq(b.x, b.y, CFG.PLAYER_X, CFG.PLAYER_Y);
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearest = b;
-      }
-    }
-    let vx = 0;
-    let vy = -CFG.STAR_SPEED;
-    if (nearest) {
-      const dx = nearest.x - CFG.PLAYER_X;
-      const dy = nearest.y - CFG.PLAYER_Y;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      vx = (dx / len) * CFG.STAR_SPEED;
-      vy = (dy / len) * CFG.STAR_SPEED;
-    }
+    const now = performance.now();
+    if (now - s.lastFireAt < CFG.FIRE_COOLDOWN_MS) return;
+    s.lastFireAt = now;
+    const dx = targetX - CFG.PLAYER_X;
+    const dy = targetY - CFG.PLAYER_Y;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
     s.stars.push({
       id: nextId(),
       x: CFG.PLAYER_X,
       y: CFG.PLAYER_Y,
-      vx,
-      vy,
-      targetId: nearest?.id ?? -1,
+      vx: (dx / len) * CFG.STAR_SPEED,
+      vy: (dy / len) * CFG.STAR_SPEED,
+      targetId: -1,
       done: false,
     });
     audio.play('select');
@@ -415,19 +405,23 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
 
   const handleTap = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    fireStar();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = CFG.W / rect.width;
+    const scaleY = CFG.H / rect.height;
+    const clientX =
+      'touches' in e
+        ? e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX ?? 0
+        : e.clientX;
+    const clientY =
+      'touches' in e
+        ? e.touches[0]?.clientY ?? e.changedTouches[0]?.clientY ?? 0
+        : e.clientY;
+    const localX = (clientX - rect.left) * scaleX;
+    const localY = (clientY - rect.top) * scaleY;
+    fireStarToward(localX, localY);
   };
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.code === 'Space' || e.key === ' ') && !e.repeat) {
-        e.preventDefault();
-        fireStar();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center bg-cream select-none">
@@ -444,7 +438,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
           width={CFG.W}
           height={CFG.H}
           className="rounded-cute-lg shadow-xl bg-white"
-          style={{ width: `${CFG.W}px`, height: `${CFG.H}px`, maxWidth: '100%', touchAction: 'none' }}
+          style={{ width: '100%', maxWidth: `${CFG.W}px`, aspectRatio: `${CFG.W} / ${CFG.H}`, maxHeight: 'calc(100dvh - 110px)', touchAction: 'none' }}
         />
         <AbilityEffectOverlay />
         <PauseModal
@@ -455,7 +449,11 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
           }}
           gameName="하늘 풍선 펑"
         />
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
@@ -470,8 +468,8 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
           </div>
         )}
       </div>
-      <div className="mt-3 text-center text-xs text-text-light font-pixel">
-        탭 / 스페이스바로 별 던지기 (자동 조준)
+      <div className="mt-3 text-center text-base font-sans font-semibold text-text-dark">
+        쏠 방향을 탭(클릭)해서 별 발사
       </div>
     </div>
   );

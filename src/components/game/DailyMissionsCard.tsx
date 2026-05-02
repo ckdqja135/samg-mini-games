@@ -36,8 +36,10 @@ export function DailyMissionsCard() {
   return (
     <div className="card-cute">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-pixel text-sm text-text-dark">📅 오늘의 미션</h3>
-        <span className="text-xs text-text-light font-pixel">
+        <h3 className="font-sans font-bold text-sm text-text-dark tracking-tight">
+          오늘의 미션
+        </h3>
+        <span className="text-xs text-text-light font-sans font-semibold tabular-nums">
           {completedCount}/{data.missions.length} 완료
         </span>
       </div>
@@ -56,13 +58,15 @@ export function DailyMissionsCard() {
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">{m.iconEmoji}</span>
-                <span className="flex-1 font-pixel text-xs text-text-dark">
+                <span className="flex-1 font-sans font-semibold text-xs text-text-dark">
                   {m.title}
                 </span>
                 {m.completed ? (
-                  <span className="text-yellow-600 font-pixel text-xs">✓ 완료!</span>
+                  <span className="text-yellow-600 font-sans font-bold text-xs">
+                    완료
+                  </span>
                 ) : (
-                  <span className="text-xs text-text-light font-pixel">
+                  <span className="text-xs text-text-light font-sans font-semibold tabular-nums">
                     {Math.min(m.progress, m.target).toLocaleString()}/
                     {m.target.toLocaleString()}
                   </span>

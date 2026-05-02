@@ -39,10 +39,11 @@
 }
 
 .character-card .char-name {
-  font-size: 11px;
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text-dark);
-  font-family: 'DungGeunMo', monospace;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  letter-spacing: -0.01em;
   margin-top: 2px;
 }
 
@@ -77,8 +78,9 @@
 
 .preview-name {
   font-size: 22px;
-  font-weight: bold;
-  font-family: 'DungGeunMo', monospace;
+  font-weight: 800;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  letter-spacing: -0.02em;
   background: linear-gradient(135deg, var(--char-color, #FF8FB1), #6B4F8C);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -117,9 +119,10 @@
 
 .ability-name {
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--text-dark);
-  font-family: 'DungGeunMo', monospace;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .ability-desc {

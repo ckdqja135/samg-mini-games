@@ -21,13 +21,12 @@ interface Props {
 
 const CFG = {
   W: 375,
-  H: 600,
-  GROUND_Y: 510,
+  H: 700,
+  GROUND_Y: 610,
   PLAYER_W: 44,
   PLAYER_H: 60,
-  WALK_SPEED: 2.0,
-  JUMP_VY: -10,
-  GRAVITY: 0.5,
+  WALK_SPEED: 1.6,
+  ITEM_LIFE_FRAMES: 480, // 약 8초간 바닥에 머무름
   SPRAY_BASE_INTERVAL: 65,
   SPRAY_MIN_INTERVAL: 28,
   SPRAY_FALL_SPEED: 4.5,
@@ -41,12 +40,14 @@ interface Spray {
   y: number;
   width: number;
   speed: number;
+  passed?: boolean;
 }
 
 interface Item {
   id: number;
   x: number;
   y: number;
+  spawnedFrame: number;
   type: keyof typeof ITEM_DEFS;
   collected: boolean;
 }
@@ -70,9 +71,7 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
   const stateRef = useRef({
     px: CFG.W / 2 - CFG.PLAYER_W / 2,
     py: CFG.GROUND_Y - CFG.PLAYER_H,
-    vy: 0,
-    onGround: true,
-    dir: 1, // 1=right, -1=left
+    dir: 1, // 1=right, -1=left (자동 이동 방향)
     sprays: [] as Spray[],
     items: [] as Item[],
     nextSpraySpawn: 60,
@@ -91,6 +90,7 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   useEffect(() => {
     setCharacter(characterId);
@@ -110,17 +110,17 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
   }, [characterId, resetGame, setCharacter]);
 
   useEffect(() => {
-    if (!ready || countdown === null) return;
+    if (!ready || countdown === null || tutorialOpen) return;
     if (countdown <= 0) {
       setCountdown(null);
       return;
     }
     const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -160,7 +160,7 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       }
       frameRef.current++;
 
-      // 자동 좌우 왕복
+      // 자동 좌우 이동 (벽에 닿으면 방향 자동 반전)
       s.px += s.dir * CFG.WALK_SPEED;
       if (s.px < 8) {
         s.px = 8;
@@ -168,17 +168,6 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       } else if (s.px + CFG.PLAYER_W > CFG.W - 8) {
         s.px = CFG.W - 8 - CFG.PLAYER_W;
         s.dir = -1;
-      }
-
-      // 점프 물리
-      if (!s.onGround) {
-        s.vy += CFG.GRAVITY;
-        s.py += s.vy;
-        if (s.py + CFG.PLAYER_H >= CFG.GROUND_Y) {
-          s.py = CFG.GROUND_Y - CFG.PLAYER_H;
-          s.vy = 0;
-          s.onGround = true;
-        }
       }
 
       // 물줄기 스폰
@@ -202,13 +191,11 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       s.sprays.forEach((sp) => (sp.y += sp.speed));
       s.sprays = s.sprays.filter((sp) => sp.y < CFG.H + 50);
 
-      // 충돌 (물줄기는 길이가 화면 밖부터 바닥까지 잠재적으로 길지만,
-      // 충돌은 떨어지는 머리 영역 + 짧은 꼬리로 판정 — 단순화 위해 머리 30px 박스로)
       for (const sp of s.sprays) {
         const sx = sp.x;
         const sy = sp.y;
         const sw = sp.width;
-        const sh = 60; // 떨어지는 물줄기 머리 영역
+        const sh = 60;
         if (
           aabbHits(s.px + 8, s.py + 12, CFG.PLAYER_W - 16, CFG.PLAYER_H - 18, sx, sy, sw, sh)
         ) {
@@ -217,29 +204,37 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
         }
       }
 
-      // 회피 콤보: 물줄기가 캐릭터 라인을 안전히 통과해 바닥 도달 시 콤보 +
+      // 회피 콤보
       s.sprays.forEach((sp) => {
-        if ((sp as Spray & { passed?: boolean }).passed) return;
+        if (sp.passed) return;
         if (sp.y > s.py + CFG.PLAYER_H) {
-          (sp as Spray & { passed?: boolean }).passed = true;
+          sp.passed = true;
           addScore(15, {});
           if (frameRef.current % 4 === 0) audio.play('jump');
         }
       });
 
-      // 아이템 스폰
+      // 아이템 스폰: 바닥(지면) 위에 랜덤 위치로 생성
       s.nextItemSpawn--;
       if (s.nextItemSpawn <= 0) {
         const type = pickWeighted(ITEM_DEFS) as keyof typeof ITEM_DEFS;
         s.items.push({
           id: nextId(),
-          x: randRange(20, CFG.W - 20 - CFG.ITEM_SIZE),
-          y: randRange(80, CFG.GROUND_Y - 180),
+          x: randRange(12, CFG.W - 12 - CFG.ITEM_SIZE),
+          y: CFG.GROUND_Y - CFG.ITEM_SIZE - 2,
+          spawnedFrame: frameRef.current,
           type,
           collected: false,
         });
         s.nextItemSpawn = CFG.ITEM_INTERVAL + Math.floor(Math.random() * 100);
       }
+
+      // 수명 만료된 아이템 제거
+      s.items = s.items.filter(
+        (it) =>
+          !it.collected &&
+          frameRef.current - it.spawnedFrame < CFG.ITEM_LIFE_FRAMES
+      );
 
       // 아이템 수집
       for (const it of s.items) {
@@ -264,7 +259,6 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       }
       s.items = s.items.filter((it) => !it.collected);
 
-      // 거리 점수 + 레벨업
       if (frameRef.current % 30 === 0) {
         s.distance += 1;
         addScore(1, { passive: true });
@@ -283,7 +277,7 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
     return () => {
       if (animFrameRef.current != null) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -300,7 +294,6 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
     ctx.fillStyle = bgRef.current;
     ctx.fillRect(0, 0, CFG.W, CFG.H);
 
-    // 바닥
     ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
     ctx.fillRect(0, CFG.GROUND_Y, CFG.W, CFG.H - CFG.GROUND_Y);
     ctx.strokeStyle = 'rgba(74, 59, 82, 0.2)';
@@ -309,7 +302,6 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
     ctx.lineTo(CFG.W, CFG.GROUND_Y);
     ctx.stroke();
 
-    // 물줄기
     s.sprays.forEach((sp) => {
       ctx.save();
       const grad = ctx.createLinearGradient(0, sp.y - 30, 0, sp.y + 80);
@@ -318,7 +310,6 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       grad.addColorStop(1, 'rgba(80, 160, 255, 0.6)');
       ctx.fillStyle = grad;
       ctx.fillRect(sp.x, sp.y - 30, sp.width, 100);
-      // 물방울 헤드
       ctx.fillStyle = '#7DC4FF';
       ctx.beginPath();
       ctx.arc(sp.x + sp.width / 2, sp.y, sp.width * 0.55, 0, Math.PI * 2);
@@ -326,10 +317,9 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       ctx.restore();
     });
 
-    // 아이템
     s.items.forEach((it) => {
       if (it.collected) return;
-      const cy = it.y + CFG.ITEM_SIZE / 2 + Math.sin(time / 320 + it.id) * 3;
+      const cy = it.y + CFG.ITEM_SIZE / 2 + Math.sin(time / 380 + it.id) * 1.2;
       ctx.save();
       const glow = ctx.createRadialGradient(
         it.x + CFG.ITEM_SIZE / 2,
@@ -352,40 +342,37 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
       ctx.restore();
     });
 
-    // 캐릭터
-    let anim: 'idle' | 'walk' | 'jump' = 'walk';
-    if (!s.onGround) anim = 'jump';
     rendererRef.current?.draw(
       ctx,
       characterId,
       s.px,
       s.py,
       CFG.PLAYER_H,
-      anim,
+      'walk',
       time,
       s.dir < 0
     );
   };
 
-  const tap = () => {
+  // 방향 반전: 탭/스페이스바 공통 핸들러
+  const flipDirection = () => {
     const s = stateRef.current;
-    if (s.isOver || !s.onGround) return;
-    s.vy = CFG.JUMP_VY;
-    s.onGround = false;
+    if (s.isOver) return;
+    s.dir = s.dir === 1 ? -1 : 1;
     audio.play('jump');
     vibrate('light');
   };
 
   const handleTap = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    tap();
+    flipDirection();
   };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.code === 'Space' || e.key === ' ') && !e.repeat) {
         e.preventDefault();
-        tap();
+        flipDirection();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -401,13 +388,17 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
           setPaused(true);
         }}
       />
-      <div className="relative mt-12" onTouchStart={handleTap} onMouseDown={handleTap}>
+      <div
+        className="relative mt-12"
+        onTouchStart={handleTap}
+        onMouseDown={handleTap}
+      >
         <canvas
           ref={canvasRef}
           width={CFG.W}
           height={CFG.H}
           className="rounded-cute-lg shadow-xl bg-white"
-          style={{ width: `${CFG.W}px`, height: `${CFG.H}px`, maxWidth: '100%', touchAction: 'none' }}
+          style={{ width: '100%', maxWidth: `${CFG.W}px`, aspectRatio: `${CFG.W} / ${CFG.H}`, maxHeight: 'calc(100dvh - 110px)', touchAction: 'none' }}
         />
         <AbilityEffectOverlay />
         <PauseModal
@@ -416,9 +407,13 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="풍뿌리기 피하기"
+          gameName="물줄기 피하기"
         />
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
@@ -433,8 +428,8 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
           </div>
         )}
       </div>
-      <div className="mt-3 text-center text-xs text-text-light font-pixel">
-        탭 / 스페이스바로 점프 회피
+      <div className="mt-3 text-center text-base font-sans font-semibold text-text-dark">
+        탭 / 스페이스바로 좌우 방향 전환
       </div>
     </div>
   );

@@ -43,11 +43,14 @@ export function AbilityIndicator() {
     const progress = Math.max(0, Math.min(1, remainMs / totalMs));
     if (remainMs > 0) {
       body = (
-        <div className="flex flex-col items-center gap-0.5 min-w-[80px]">
+        <div className="flex flex-col items-center gap-0.5 min-w-[88px]">
           <div className="flex items-center gap-1">
-            <span>{ability.iconEmoji}</span>
-            <span className="text-[10px] font-pixel text-text-dark">
-              ×{ability.effect.baseValue} {Math.ceil(remainMs / 1000)}s
+            <span className="text-sm">{ability.iconEmoji}</span>
+            <span className="text-[11px] font-sans font-bold text-text-dark tabular-nums">
+              점수 ×{ability.effect.baseValue}
+            </span>
+            <span className="text-[10px] font-sans text-text-light tabular-nums">
+              {Math.ceil(remainMs / 1000)}초
             </span>
           </div>
           <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden">
@@ -64,30 +67,46 @@ export function AbilityIndicator() {
     } else {
       body = (
         <div className="flex items-center gap-1 opacity-50">
-          <span>{ability.iconEmoji}</span>
-          <span className="text-[10px] font-pixel text-text-light">종료</span>
+          <span className="text-sm">{ability.iconEmoji}</span>
+          <span className="text-[10px] font-sans text-text-light">종료</span>
         </div>
       );
     }
   } else if (ability.effect.type === 'combo_bonus') {
     // 하츄핑: 5콤보당, 새콤핑: 10콤보당
     const interval = ability.effect.trigger?.every ?? 5;
-    const next = Math.ceil((comboCount + 1) / interval) * interval;
-    const need = next - comboCount;
+    const filled = comboCount % interval;
+    const progress = filled / interval;
     body = (
-      <div className="flex items-center gap-1">
-        <span>{ability.iconEmoji}</span>
-        <span className="text-[10px] font-pixel text-text-dark">
-          {need}콤보 → +{ability.effect.baseValue}
-        </span>
+      <div className="flex flex-col items-stretch gap-1 min-w-[110px]">
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1">
+            <span className="text-sm leading-none">{ability.iconEmoji}</span>
+            <span className="text-[11px] font-sans font-bold text-text-dark">
+              +{ability.effect.baseValue}점
+            </span>
+          </div>
+          <span className="text-[10px] font-sans font-bold text-text-light tabular-nums">
+            {filled}/{interval}
+          </span>
+        </div>
+        <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden">
+          <div
+            className="h-full transition-all"
+            style={{
+              width: `${progress * 100}%`,
+              background: char.color,
+            }}
+          />
+        </div>
       </div>
     );
   } else if (ability.effect.type === 'event_bonus') {
     // 샤샤핑
     body = (
       <div className="flex items-center gap-1">
-        <span className="animate-pulse">{ability.iconEmoji}</span>
-        <span className="text-[10px] font-pixel text-text-dark">
+        <span className="animate-pulse text-sm">{ability.iconEmoji}</span>
+        <span className="text-[11px] font-sans font-bold text-text-dark tabular-nums">
           아이템 ×{ability.effect.baseValue}
         </span>
       </div>
@@ -96,9 +115,9 @@ export function AbilityIndicator() {
     // 달콤핑
     body = (
       <div className="flex items-center gap-1">
-        <span>{ability.iconEmoji}</span>
-        <span className="text-[10px] font-pixel text-text-dark">
-          전체 +{Math.round((ability.effect.baseValue - 1) * 100)}%
+        <span className="text-sm">{ability.iconEmoji}</span>
+        <span className="text-[11px] font-sans font-bold text-text-dark tabular-nums">
+          전체 점수 +{Math.round((ability.effect.baseValue - 1) * 100)}%
         </span>
       </div>
     );

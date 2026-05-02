@@ -129,7 +129,7 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
   if (!loaded) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="font-pixel text-text-light">결과 불러오는 중...</p>
+        <p className="font-sans text-text-light">결과 불러오는 중...</p>
       </div>
     );
   }
@@ -137,12 +137,11 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
   if (!result) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center px-6 gap-3 text-center">
-        <div className="text-5xl">🤔</div>
-        <h2 className="font-pixel text-lg text-text-dark">
+        <h2 className="font-sans font-bold text-lg text-text-dark">
           결과 데이터가 없어요
         </h2>
         <Link href={`/games/${gameId}`} className="block w-full">
-          <CuteButton variant="primary" fullWidth withSparkle>
+          <CuteButton variant="primary" fullWidth>
             다시 시작하기
           </CuteButton>
         </Link>
@@ -158,8 +157,8 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
     <div className="relative flex-1 flex flex-col items-center px-6 py-6 gap-3">
       {(isNewRecord || top5Updated) && <Confetti count={100} durationMs={3000} />}
 
-      <h1 className="font-pixel text-2xl text-primary-pink relative z-10">
-        🎉 Game Over! 🎉
+      <h1 className="font-sans font-bold text-2xl text-primary-pink relative z-10 tracking-tight">
+        Game Over
       </h1>
 
       <div className="flex justify-center my-1">
@@ -170,23 +169,23 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
         />
       </div>
 
-      <p className="font-pixel text-sm text-text-dark">{gameName}</p>
+      <p className="font-sans font-semibold text-sm text-text-dark">{gameName}</p>
 
       <div className="card-cute w-full text-center py-4">
         <p className="text-xs text-text-light">최종 점수</p>
-        <p className="font-pixel text-4xl text-primary-pink mt-1">
-          ✨ <CountUp to={result.score} duration={1500} /> ✨
+        <p className="font-sans font-bold text-4xl text-primary-pink mt-1 tracking-tight">
+          <CountUp to={result.score} duration={1500} />
         </p>
       </div>
 
       {isNewRecord && (
         <div
-          className="w-full px-4 py-3 rounded-cute-lg border-2 border-yellow-300 bg-gradient-to-r from-yellow-100 to-pink-100 text-center font-pixel"
+          className="w-full px-4 py-3 rounded-cute-lg border-2 border-yellow-300 bg-gradient-to-r from-yellow-100 to-pink-100 text-center font-sans font-bold"
           style={{
             animation: 'character-celebrate 0.8s ease-in-out infinite',
           }}
         >
-          🏆 <span className="text-primary-pink">새로운 기록!</span>
+          <span className="text-primary-pink">새로운 기록!</span>
           {myRank && myRank <= 100 && (
             <span className="ml-2 text-text-dark">#{myRank}위</span>
           )}
@@ -194,13 +193,13 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
       )}
 
       {!isNewRecord && submit.status === 'success' && myRank && (
-        <div className="w-full px-4 py-2 rounded-cute bg-white/70 text-center font-pixel text-sm text-text-dark">
+        <div className="w-full px-4 py-2 rounded-cute bg-white/70 text-center font-sans font-semibold text-sm text-text-dark">
           현재 순위: <span className="text-primary-pink">#{myRank}위</span>
         </div>
       )}
 
       {submit.status === 'error' && (
-        <div className="w-full px-4 py-2 rounded-cute bg-red-50 border border-red-200 text-center font-pixel text-xs text-red-600">
+        <div className="w-full px-4 py-2 rounded-cute bg-red-50 border border-red-200 text-center font-sans text-xs text-red-600">
           {submit.message}
         </div>
       )}
@@ -208,11 +207,11 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
       <div className="grid grid-cols-2 gap-2 w-full">
         <div className="card-cute py-3 text-center">
           <p className="text-xs text-text-light">최고 콤보</p>
-          <p className="font-pixel text-lg text-text-dark">{result.maxCombo}</p>
+          <p className="font-sans font-bold text-lg text-text-dark">{result.maxCombo}</p>
         </div>
         <div className="card-cute py-3 text-center">
           <p className="text-xs text-text-light">능력 발동</p>
-          <p className="font-pixel text-lg text-text-dark">
+          <p className="font-sans font-bold text-lg text-text-dark">
             {result.abilityActivations}회
           </p>
         </div>
@@ -220,14 +219,14 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
 
       {ranking && (
         <div className="card-cute w-full">
-          <h3 className="font-pixel text-sm text-text-dark mb-2">
-            🏆 TOP 5 랭킹
+          <h3 className="font-sans font-bold text-sm text-text-dark mb-2">
+            TOP 5 랭킹
           </h3>
           <RankingList ranking={ranking.ranking} myUserId={myUserId} />
         </div>
       )}
 
-      <div className="mt-auto w-full flex flex-col gap-2 pt-2">
+      <div className="w-full flex flex-col gap-2 pt-2">
         <ShareButton
           gameName={gameName}
           score={result.score}
@@ -236,13 +235,13 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
           }
         />
         <Link href={`/games/${gameId}`} className="block">
-          <CuteButton variant="primary" fullWidth withSparkle>
-            🔄 다시하기
+          <CuteButton variant="primary" fullWidth>
+            다시하기
           </CuteButton>
         </Link>
         <Link href="/games" className="block">
           <CuteButton variant="secondary" fullWidth>
-            🏠 게임선택
+            게임선택
           </CuteButton>
         </Link>
       </div>

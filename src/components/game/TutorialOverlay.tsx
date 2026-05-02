@@ -3,15 +3,13 @@
 import { useEffect, useState } from 'react';
 import { CuteButton } from '@/components/ui/CuteButton';
 
-const STORAGE_KEY = 'samg:tutorialSeen';
-
-interface Tutorial {
+export interface Tutorial {
   emoji: string;
   title: string;
   steps: string[];
 }
 
-const TUTORIALS: Record<string, Tutorial> = {
+export const TUTORIALS: Record<string, Tutorial> = {
   'cloud-jump': {
     emoji: '☁️',
     title: '구름 점프',
@@ -36,24 +34,24 @@ const TUTORIALS: Record<string, Tutorial> = {
   },
   'water-dodge': {
     emoji: '💧',
-    title: '풍뿌리기 피하기',
+    title: '물줄기 피하기',
     steps: [
-      '캐릭터가 자동으로 좌우 왕복',
-      '탭/스페이스바 = 점프',
+      '캐릭터가 자동으로 좌우로 이동해요',
+      '탭/스페이스바 = 방향 전환',
       '하늘에서 떨어지는 물줄기 회피',
       '안전히 통과하면 콤보 +',
-      '과일 수집 시 추가 점수',
+      '🍓🍒🍋🍇 과일 수집 시 추가 점수',
     ],
   },
   'cake-catch': {
     emoji: '🍰',
     title: '케이크 캐치',
     steps: [
-      '바닥에서 좌우로 자동 이동',
-      '탭/스페이스바 = 점프 캐치',
-      '🍰🍩🍬⭐ 디저트 받기',
-      '💣 폭탄은 절대 받지 말 것!',
-      '디저트 3개 놓치면 게임오버',
+      '캐릭터가 자동으로 좌우로 이동해요',
+      '탭/스페이스바 = 방향 전환',
+      '🍰🍩🍬⭐ 디저트가 하늘에서 떨어져요 — 받기',
+      '🍓🍒🍋🍇 보너스 과일도 가끔 떨어져요',
+      '💣 폭탄에 닿으면 즉시 게임오버!',
     ],
   },
   'balloon-pop': {
@@ -62,8 +60,8 @@ const TUTORIALS: Record<string, Tutorial> = {
     steps: [
       '캐릭터는 가운데 고정',
       '풍선이 사방에서 다가와요',
-      '탭/스페이스바 = 별 발사',
-      '가장 가까운 풍선에 자동 조준',
+      '쏠 방향을 탭(클릭)하면 별이 그쪽으로 날아가요',
+      '풍선 궤적을 예측해서 조준!',
       '풍선이 닿으면 게임오버',
     ],
   },
@@ -93,34 +91,20 @@ const TUTORIALS: Record<string, Tutorial> = {
 
 interface TutorialOverlayProps {
   gameId: string;
+  onShow?: () => void;
   onDismiss: () => void;
 }
 
-export function TutorialOverlay({ gameId, onDismiss }: TutorialOverlayProps) {
-  const [shown, setShown] = useState(false);
+export function TutorialOverlay({ gameId, onShow, onDismiss }: TutorialOverlayProps) {
+  const [shown, setShown] = useState(true);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const seenRaw = localStorage.getItem(STORAGE_KEY);
-      const seen: string[] = seenRaw ? JSON.parse(seenRaw) : [];
-      if (!seen.includes(gameId)) setShown(true);
-    } catch {
-      setShown(true);
-    }
+    setShown(true);
+    onShow?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   const handleClose = () => {
-    try {
-      const seenRaw = localStorage.getItem(STORAGE_KEY);
-      const seen: string[] = seenRaw ? JSON.parse(seenRaw) : [];
-      if (!seen.includes(gameId)) {
-        seen.push(gameId);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seen));
-      }
-    } catch {
-      // ignore
-    }
     setShown(false);
     onDismiss();
   };

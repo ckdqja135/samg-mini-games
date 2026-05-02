@@ -8,11 +8,12 @@ import { CuteButton } from '@/components/ui/CuteButton';
 import { PhoneInput } from '@/components/auth/PhoneInput';
 import { useAuthStore } from '@/store/authStore';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
 
   const [phone, setPhone] = useState('');
+  const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,16 +23,16 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone }),
+        body: JSON.stringify({ phoneNumber: phone, nickname }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || '로그인에 실패했습니다');
+        setError(data.error || '회원가입에 실패했습니다');
         setSubmitting(false);
         return;
       }
@@ -44,7 +45,8 @@ export default function LoginPage() {
     }
   };
 
-  const isValid = phone.replace(/[^0-9]/g, '').length >= 10;
+  const isValid =
+    phone.replace(/[^0-9]/g, '').length >= 10 && nickname.trim().length >= 2;
 
   return (
     <MobileFrame>
@@ -52,18 +54,18 @@ export default function LoginPage() {
         <div className="flex items-center mb-6">
           <Link href="/" className="text-text-dark text-xl">←</Link>
           <h1 className="flex-1 text-center font-sans font-bold text-lg text-text-dark tracking-tight">
-            로그인
+            회원가입
           </h1>
           <div className="w-6" />
         </div>
 
         <div className="text-center mt-4 mb-8">
           <h2 className="font-sans font-bold text-2xl text-primary-pink mb-2 tracking-tight">
-            다시 만나서 반가워요!
+            처음 오셨군요!
           </h2>
           <p className="text-sm text-text-light leading-relaxed">
-            가입한 전화번호로<br />
-            다시 시작해볼까요?
+            전화번호와 닉네임을 입력하면<br />
+            바로 게임을 시작할 수 있어요
           </p>
         </div>
 
@@ -79,6 +81,21 @@ export default function LoginPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-text-dark mb-2 ml-1">
+              닉네임 (2~10자)
+            </label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="별빛핑"
+              maxLength={10}
+              disabled={submitting}
+              className="input-cute text-center"
+            />
+          </div>
+
           {error && (
             <p className="text-red-500 text-sm text-center font-pixel">
               {error}
@@ -91,13 +108,13 @@ export default function LoginPage() {
             fullWidth
             disabled={!isValid || submitting}
           >
-            {submitting ? '잠시만요...' : '로그인'}
+            {submitting ? '잠시만요...' : '가입하기'}
           </CuteButton>
 
           <p className="text-xs text-text-light text-center mt-2">
-            아직 계정이 없나요?{' '}
-            <Link href="/auth/signup" className="text-primary-pink font-bold underline">
-              회원가입
+            이미 계정이 있나요?{' '}
+            <Link href="/auth/login" className="text-primary-pink font-bold underline">
+              로그인
             </Link>
           </p>
         </form>

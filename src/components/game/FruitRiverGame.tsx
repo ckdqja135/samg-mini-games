@@ -21,13 +21,13 @@ interface Props {
 
 const CFG = {
   W: 375,
-  H: 600,
+  H: 700,
   RIVER_TOP: 120,
-  RIVER_BOTTOM: 560,
+  RIVER_BOTTOM: 660,
   PLAYER_X: 80,
   PLAYER_W: 50,
   PLAYER_H: 60,
-  PLAYER_GROUND_Y: 470,
+  PLAYER_GROUND_Y: 570,
   JUMP_VY: -10.5,
   GRAVITY: 0.5,
   SCROLL_BASE: 2.6,
@@ -94,6 +94,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
   const [countdown, setCountdown] = useState<number | null>(3);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   useEffect(() => {
     setCharacter(characterId);
@@ -112,17 +113,17 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
   }, [characterId, resetGame, setCharacter]);
 
   useEffect(() => {
-    if (!ready || countdown === null) return;
+    if (!ready || countdown === null || tutorialOpen) return;
     if (countdown <= 0) {
       setCountdown(null);
       return;
     }
     const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 700);
     return () => clearTimeout(t);
-  }, [countdown, ready]);
+  }, [countdown, ready, tutorialOpen]);
 
   useEffect(() => {
-    if (!ready || countdown !== null) return;
+    if (!ready || countdown !== null || tutorialOpen) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -276,7 +277,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
     return () => {
       if (animFrameRef.current != null) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [ready, countdown, addScore, characterId, gameId, router]);
+  }, [ready, countdown, tutorialOpen, addScore, characterId, gameId, router]);
 
   const drawScene = (
     ctx: CanvasRenderingContext2D,
@@ -425,7 +426,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
           width={CFG.W}
           height={CFG.H}
           className="rounded-cute-lg shadow-xl bg-white"
-          style={{ width: `${CFG.W}px`, height: `${CFG.H}px`, maxWidth: '100%', touchAction: 'none' }}
+          style={{ width: '100%', maxWidth: `${CFG.W}px`, aspectRatio: `${CFG.W} / ${CFG.H}`, maxHeight: 'calc(100dvh - 110px)', touchAction: 'none' }}
         />
         <AbilityEffectOverlay />
         <PauseModal
@@ -436,7 +437,11 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
           }}
           gameName="과일 흐름타기"
         />
-        <TutorialOverlay gameId={gameId} onDismiss={() => {}} />
+        <TutorialOverlay
+          gameId={gameId}
+          onShow={() => setTutorialOpen(true)}
+          onDismiss={() => setTutorialOpen(false)}
+        />
         <AbilityIndicator />
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm rounded-cute-lg">
