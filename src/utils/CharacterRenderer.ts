@@ -1,22 +1,25 @@
-import { SPRITE_SHEET, getCharacter } from '@/data/characterSprite';
+import { CHARACTER_SPRITES, getCharacter } from '@/data/characterSprite';
 
 export type CanvasAnimation = 'idle' | 'walk' | 'jump' | 'hurt';
 
 export class CharacterRenderer {
-  private image: HTMLImageElement;
-  private isLoaded = false;
+  private images = new Map<string, HTMLImageElement>();
   private loadPromise: Promise<void>;
 
   constructor() {
-    this.image = new Image();
-    this.loadPromise = new Promise((resolve, reject) => {
-      this.image.onload = () => {
-        this.isLoaded = true;
-        resolve();
-      };
-      this.image.onerror = () => reject(new Error('Failed to load sprite sheet'));
-    });
-    this.image.src = SPRITE_SHEET.url;
+    const promises: Promise<void>[] = [];
+    for (const char of CHARACTER_SPRITES) {
+      const img = new Image();
+      this.images.set(char.id, img);
+      promises.push(
+        new Promise<void>((resolve) => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // 개별 실패해도 다른 캐릭터는 진행
+          img.src = char.imageUrl;
+        })
+      );
+    }
+    this.loadPromise = Promise.all(promises).then(() => undefined);
   }
 
   async preload(): Promise<void> {
@@ -37,14 +40,23 @@ export class CharacterRenderer {
     time = 0,
     flipX = false
   ): void {
-    if (!this.isLoaded) return;
+    const img = this.images.get(characterId);
+    if (!img || !img.complete || img.naturalWidth === 0) return;
 
     const character = getCharacter(characterId);
     if (!character) return;
 
-    const { bounds } = character;
-    const aspect = bounds.width / bounds.height;
-    const width = height * aspect;
+    // 자연 종횡비 사용 (없으면 정의된 aspectRatio 폴백)
+    const aspect =
+      img.naturalHeight > 0
+        ? img.naturalWidth / img.naturalHeight
+        : character.aspectRatio;
+    // 충돌·위치 기준은 원래 height (게임 로직 안 깨지게)
+    const baseWidth = height * aspect;
+    // 시각적 크기는 displayScale 적용
+    const drawScale = character.displayScale ?? 1;
+    const drawHeight = height * drawScale;
+    const drawWidth = baseWidth * drawScale;
 
     let offsetY = 0;
     let scaleX = 1;
@@ -71,31 +83,26 @@ export class CharacterRenderer {
     }
 
     ctx.save();
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
-    ctx.translate(x + width / 2, y + height / 2 + offsetY);
+    // 원래 충돌박스 중앙에 그림 (스케일된 이미지가 중앙 정렬)
+    ctx.translate(x + baseWidth / 2, y + height / 2 + offsetY);
     ctx.rotate(rotation);
     ctx.scale(scaleX * (flipX ? -1 : 1), scaleY);
-    ctx.translate(-width / 2, -height / 2);
+    ctx.translate(-drawWidth / 2, -drawHeight / 2);
 
-    ctx.drawImage(
-      this.image,
-      bounds.x,
-      bounds.y,
-      bounds.width,
-      bounds.height,
-      0,
-      0,
-      width,
-      height
-    );
+    ctx.drawImage(img, 0, 0, drawWidth, drawHeight);
     ctx.restore();
   }
 
-  /** 캐릭터의 종횡비(width/height)를 반환 — 충돌 박스 계산 등에 사용 */
+  /** 캐릭터의 종횡비(width/height)를 반환 */
   getAspectRatio(characterId: string): number {
+    const img = this.images.get(characterId);
+    if (img && img.naturalHeight > 0) {
+      return img.naturalWidth / img.naturalHeight;
+    }
     const character = getCharacter(characterId);
-    if (!character) return 1;
-    return character.bounds.width / character.bounds.height;
+    return character?.aspectRatio ?? 1;
   }
 }

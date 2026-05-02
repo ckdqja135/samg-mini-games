@@ -1,7 +1,7 @@
 'use client';
 
 import { CSSProperties } from 'react';
-import { SPRITE_SHEET, getCharacter } from '@/data/characterSprite';
+import { getCharacter } from '@/data/characterSprite';
 
 export type CharacterAnimation =
   | 'idle'
@@ -29,20 +29,16 @@ export function CharacterSprite({
   const character = getCharacter(characterId);
   if (!character) return null;
 
-  const { bounds } = character;
-  const { totalWidth, totalHeight, url } = SPRITE_SHEET;
-
-  const scale = size / bounds.height;
-  const displayWidth = bounds.width * scale;
+  const scaledHeight = size * (character.displayScale ?? 1);
+  const displayWidth = scaledHeight * character.aspectRatio;
 
   const style: CSSProperties = {
     width: `${displayWidth}px`,
-    height: `${size}px`,
-    backgroundImage: `url(${url})`,
-    backgroundPosition: `-${bounds.x * scale}px -${bounds.y * scale}px`,
-    backgroundSize: `${totalWidth * scale}px ${totalHeight * scale}px`,
+    height: `${scaledHeight}px`,
+    backgroundImage: `url(${character.imageUrl})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
-    imageRendering: 'pixelated',
   };
 
   return (

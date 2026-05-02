@@ -75,6 +75,7 @@ function createInitialState(): GameState {
     spawnTopY: clouds.reduce((min, c) => Math.min(min, c.y), CANVAS_HEIGHT),
     isGameOver: false,
     startedAt: 0,
+    lastScoredCloudId: null,
   };
 }
 
@@ -242,6 +243,12 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
           const isTrampoline = cloud.type === 'trampoline';
           s.player.vy = isTrampoline ? TRAMPOLINE_POWER : JUMP_POWER;
           s.player.y = cloud.y - s.player.height;
+
+          // 같은 구름 재착지 → 바운스만 발생, 점수·콤보·SFX 모두 스킵
+          if (s.lastScoredCloudId === cloud.id) {
+            break;
+          }
+          s.lastScoredCloudId = cloud.id;
 
           let baseScore = 20;
           let isItemBonus = false;

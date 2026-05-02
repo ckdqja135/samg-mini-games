@@ -44,6 +44,8 @@ export interface GameState {
   spawnTopY: number;
   isGameOver: boolean;
   startedAt: number;
+  /** 가장 최근에 점수/콤보가 적용된 구름 ID — 같은 구름 재착지 시 중복 카운트 방지 */
+  lastScoredCloudId: number | null;
 }
 
 export interface GameOverResult {

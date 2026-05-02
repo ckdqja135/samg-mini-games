@@ -49,14 +49,14 @@ export function ProfileClient() {
 
   if (loading) {
     return (
-      <div className="text-center text-text-light font-pixel py-10">
+      <div className="text-center text-text-light font-sans py-10">
         불러오는 중...
       </div>
     );
   }
   if (!data) {
     return (
-      <div className="card-cute text-center text-text-light font-pixel py-6">
+      <div className="card-cute text-center text-text-light font-sans py-6">
         데이터를 불러오지 못했어요
       </div>
     );
@@ -74,20 +74,28 @@ export function ProfileClient() {
           <div className="text-5xl">💖</div>
         )}
         <div className="flex-1">
-          <p className="font-pixel text-lg text-primary-pink">
+          <p className="font-sans font-bold text-lg text-primary-pink tracking-tight">
             {data.user.nickname}
           </p>
-          <p className="text-xs text-text-light">{data.user.phoneNumber}</p>
-          <p className="text-xs text-text-light mt-1">
-            총 플레이 <strong className="text-text-dark">{data.totalPlays}</strong>회
+          <p className="text-xs text-text-light font-sans tabular-nums">
+            {data.user.phoneNumber}
+          </p>
+          <p className="text-xs text-text-light mt-1 font-sans">
+            총 플레이{' '}
+            <strong className="text-text-dark font-bold tabular-nums">
+              {data.totalPlays}
+            </strong>
+            회
           </p>
         </div>
       </div>
 
       <div className="card-cute">
-        <h2 className="font-pixel text-sm text-text-dark mb-3">🏆 게임별 최고기록</h2>
+        <h2 className="font-sans font-bold text-sm text-text-dark mb-3 tracking-tight">
+          게임별 최고기록
+        </h2>
         {data.perGame.length === 0 ? (
-          <p className="text-xs text-text-light text-center py-3 font-pixel">
+          <p className="text-xs text-text-light text-center py-3 font-sans">
             아직 플레이한 게임이 없어요
           </p>
         ) : (
@@ -100,11 +108,13 @@ export function ProfileClient() {
                   href={`/games/${g.gameId}`}
                   className="flex items-center gap-2 px-3 py-2 rounded-cute bg-white/60 hover:bg-white/90 transition-colors"
                 >
-                  <span className="flex-1 font-pixel text-sm text-text-dark truncate">
+                  <span className="flex-1 font-sans font-semibold text-sm text-text-dark truncate">
                     {GAME_NAMES[g.gameId] ?? g.gameId}
                   </span>
-                  <span className="text-xs text-text-light">{g.plays}회</span>
-                  <span className="font-pixel text-primary-pink">
+                  <span className="text-xs text-text-light font-sans tabular-nums">
+                    {g.plays}회
+                  </span>
+                  <span className="font-sans font-bold text-primary-pink tabular-nums">
                     {g.bestScore.toLocaleString()}점
                   </span>
                 </Link>
@@ -114,9 +124,11 @@ export function ProfileClient() {
       </div>
 
       <div className="card-cute">
-        <h2 className="font-pixel text-sm text-text-dark mb-3">💖 자주 쓴 핑</h2>
+        <h2 className="font-sans font-bold text-sm text-text-dark mb-3 tracking-tight">
+          자주 쓴 캐릭터
+        </h2>
         {data.favoriteCharacters.length === 0 ? (
-          <p className="text-xs text-text-light text-center py-3 font-pixel">
+          <p className="text-xs text-text-light text-center py-3 font-sans">
             아직 캐릭터를 골라 플레이한 기록이 없어요
           </p>
         ) : (
@@ -131,10 +143,12 @@ export function ProfileClient() {
                     size={idx === 0 ? 70 : 50}
                     animation={idx === 0 ? 'celebrate' : 'idle'}
                   />
-                  <span className="font-pixel text-xs text-text-dark">
+                  <span className="font-sans font-semibold text-xs text-text-dark">
                     {char.name}
                   </span>
-                  <span className="text-[10px] text-text-light">{c.plays}회</span>
+                  <span className="text-[10px] text-text-light font-sans tabular-nums">
+                    {c.plays}회
+                  </span>
                 </div>
               );
             })}
@@ -143,9 +157,11 @@ export function ProfileClient() {
       </div>
 
       <div className="card-cute">
-        <h2 className="font-pixel text-sm text-text-dark mb-3">📜 최근 플레이</h2>
+        <h2 className="font-sans font-bold text-sm text-text-dark mb-3 tracking-tight">
+          최근 플레이
+        </h2>
         {data.recentPlays.length === 0 ? (
-          <p className="text-xs text-text-light text-center py-3 font-pixel">
+          <p className="text-xs text-text-light text-center py-3 font-sans">
             기록이 없어요
           </p>
         ) : (
@@ -153,13 +169,15 @@ export function ProfileClient() {
             {data.recentPlays.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-cute bg-white/60 font-pixel text-sm"
+                className="flex items-center gap-2 px-3 py-2 rounded-cute bg-white/60 font-sans text-sm"
               >
-                <span className="flex-1 text-text-dark truncate">
+                <span className="flex-1 font-semibold text-text-dark truncate">
                   {GAME_NAMES[p.gameId] ?? p.gameId}
                 </span>
-                <span className="text-xs text-text-light">콤보 {p.maxCombo}</span>
-                <span className="text-primary-pink">
+                <span className="text-xs text-text-light tabular-nums">
+                  콤보 {p.maxCombo}
+                </span>
+                <span className="font-bold text-primary-pink tabular-nums">
                   {p.score.toLocaleString()}
                 </span>
               </li>

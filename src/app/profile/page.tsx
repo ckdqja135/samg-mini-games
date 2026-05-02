@@ -16,7 +16,7 @@ export default async function ProfilePage() {
           <Link href="/games" className="text-text-dark text-xl px-1">
             ←
           </Link>
-          <h1 className="flex-1 text-center font-pixel text-lg text-text-dark">
+          <h1 className="flex-1 text-center font-sans font-bold text-lg text-text-dark tracking-tight">
             내 프로필
           </h1>
           <div className="w-6" />
