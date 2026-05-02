@@ -28,15 +28,15 @@ const CFG = {
   PLAYER_W: 50,
   PLAYER_H: 60,
   PLAYER_GROUND_Y: 570,
-  JUMP_VY: -10.5,
-  GRAVITY: 0.5,
-  SCROLL_BASE: 2.6,
-  SCROLL_MAX: 4.6,
+  JUMP_VY: -8.4,
+  GRAVITY: 0.32,
+  SCROLL_BASE: 1.7,
+  SCROLL_MAX: 3.0,
   ITEM_SIZE: 30,
-  ROCK_W: 40,
-  ROCK_H: 36,
-  SPAWN_INTERVAL_BASE: 60,
-  SPAWN_INTERVAL_MIN: 30,
+  ROCK_W: 30,
+  ROCK_H: 22,
+  SPAWN_INTERVAL_BASE: 80,
+  SPAWN_INTERVAL_MIN: 50,
 };
 
 const ITEM_DEFS = {
@@ -189,8 +189,8 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
           });
         } else {
           const type = pickWeighted(ITEM_DEFS) as keyof typeof ITEM_DEFS;
-          // 과일은 점프 높이에 위치 → 점프 시 캐치
-          const isHigh = Math.random() < 0.7;
+          // 대부분 낮은 쪽(자동 캐치), 가끔 점프해야 잡는 보너스 위치
+          const isHigh = Math.random() < 0.3;
           s.items.push({
             id: nextId(),
             x: CFG.W + 20,
@@ -456,7 +456,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
           </div>
         )}
       </div>
-      <div className="mt-3 text-center text-xs text-text-light font-pixel">
+      <div className="mt-3 text-center text-base font-sans font-semibold text-text-dark">
         탭 / 스페이스바로 점프 — 바위 회피 + 과일 캐치
       </div>
     </div>

@@ -28,11 +28,11 @@ const CFG = {
   LADDER_X_LEFT: 110,
   LADDER_X_RIGHT: 265,
   LADDER_WIDTH: 50,
-  CLIMB_SPEED: 1.4,
-  ITEM_FALL_SPEED: 4.0,
+  CLIMB_SPEED: 0.95,
+  ITEM_FALL_SPEED: 2.4,
   ITEM_SIZE: 32,
-  SPAWN_INTERVAL_BASE: 50,
-  SPAWN_INTERVAL_MIN: 24,
+  SPAWN_INTERVAL_BASE: 75,
+  SPAWN_INTERVAL_MIN: 42,
 };
 
 interface FallingObj {
@@ -147,7 +147,7 @@ export function StarLadderGame({ gameId, characterId }: Props) {
       frameRef.current++;
 
       // 사다리 등반 효과 (배경 스크롤)
-      ladderOffsetRef.current = (ladderOffsetRef.current + CFG.CLIMB_SPEED * (1 + s.level * 0.15)) % 30;
+      ladderOffsetRef.current = (ladderOffsetRef.current + CFG.CLIMB_SPEED * (1 + s.level * 0.1)) % 30;
 
       // 스폰
       s.nextSpawn--;
@@ -170,7 +170,7 @@ export function StarLadderGame({ gameId, characterId }: Props) {
         s.nextSpawn = interval + Math.floor(Math.random() * 16);
       }
 
-      const fallSpeed = CFG.ITEM_FALL_SPEED + s.level * 0.4;
+      const fallSpeed = CFG.ITEM_FALL_SPEED + s.level * 0.22;
       s.objs.forEach((o) => (o.y += fallSpeed));
 
       // 충돌

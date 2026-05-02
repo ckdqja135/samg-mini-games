@@ -338,7 +338,11 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
           MIN_VERTICAL_GAP +
           Math.random() * (MAX_VERTICAL_GAP - MIN_VERTICAL_GAP);
         s.spawnTopY -= gap;
-        const newCloud = generateCloud(s.spawnTopY, s.level);
+        // 가장 위 (가장 최근에 스폰된) 구름의 x를 기준으로 새 구름 위치 제약
+        const topCloud = s.clouds.reduce((top, c) =>
+          c.y < top.y ? c : top
+        , s.clouds[0]);
+        const newCloud = generateCloud(s.spawnTopY, s.level, topCloud?.x);
         s.clouds.push(newCloud);
         const fruit = maybeGenerateFruit(newCloud);
         if (fruit) s.fruits.push(fruit);

@@ -1,19 +1,21 @@
 import type { Cloud, CloudType, Fruit, FruitType } from '@/types/cloudJump';
 
 export const CLOUD_JUMP_CONFIG = {
-  GRAVITY: 0.28,
-  JUMP_POWER: -9.5,
-  TRAMPOLINE_POWER: -15,
-  MOVE_SPEED: 2.4,
+  GRAVITY: 0.13,
+  JUMP_POWER: -6.5,
+  TRAMPOLINE_POWER: -10.3,
+  MOVE_SPEED: 1.7,
   CANVAS_WIDTH: 375,
   CANVAS_HEIGHT: 700,
   PLAYER_HEIGHT: 64,
   CLOUD_WIDTH: 70,
   CLOUD_HEIGHT: 22,
   CLOUD_COUNT: 12,
-  MIN_VERTICAL_GAP: 70,
-  MAX_VERTICAL_GAP: 110,
-  MOVING_CLOUD_SPEED: 1.0,
+  MIN_VERTICAL_GAP: 55,
+  MAX_VERTICAL_GAP: 88,
+  MAX_HORIZ_REACH: 130,
+  MIN_HORIZ_CHANGE: 50,
+  MOVING_CLOUD_SPEED: 0.75,
   FRUIT_SIZE: 28,
   FRUIT_SPAWN_CHANCE: 0.35,
 };
@@ -56,12 +58,60 @@ export function resetCloudIdCounter() {
 
 export function generateCloud(
   topY: number,
-  level: number
+  level: number,
+  prevX?: number
 ): Cloud {
-  const { CANVAS_WIDTH, CLOUD_WIDTH, CLOUD_HEIGHT, MOVING_CLOUD_SPEED } =
-    CLOUD_JUMP_CONFIG;
+  const {
+    CANVAS_WIDTH,
+    CLOUD_WIDTH,
+    CLOUD_HEIGHT,
+    MOVING_CLOUD_SPEED,
+    MAX_HORIZ_REACH,
+  } = CLOUD_JUMP_CONFIG;
   const type = pickCloudType(level);
-  const x = Math.random() * (CANVAS_WIDTH - CLOUD_WIDTH);
+
+  // 이전 구름 기준 도달 가능한 수평 범위 + 한쪽 쏠림 방지 (지그재그)
+  const { MIN_HORIZ_CHANGE } = CLOUD_JUMP_CONFIG;
+  let x: number;
+  if (prevX !== undefined) {
+    const prevCenter = prevX + CLOUD_WIDTH / 2;
+    const minCenter = Math.max(CLOUD_WIDTH / 2, prevCenter - MAX_HORIZ_REACH);
+    const maxCenter = Math.min(
+      CANVAS_WIDTH - CLOUD_WIDTH / 2,
+      prevCenter + MAX_HORIZ_REACH
+    );
+
+    // 이전이 좌반부면 우측 쪽, 우반부면 좌측 쪽으로 바이어스 (가장자리 쏠림 방지)
+    const canvasMid = CANVAS_WIDTH / 2;
+    const preferRightSide = prevCenter < canvasMid;
+
+    // 최소 변화량 적용한 양쪽 후보 영역
+    const leftMax = prevCenter - MIN_HORIZ_CHANGE;
+    const rightMin = prevCenter + MIN_HORIZ_CHANGE;
+
+    const leftAvailable = leftMax > minCenter;
+    const rightAvailable = rightMin < maxCenter;
+
+    let center: number;
+    if (leftAvailable && rightAvailable) {
+      // 양쪽 다 가능 → 바이어스된 쪽을 70% 확률로 선택
+      const goRight = Math.random() < (preferRightSide ? 0.7 : 0.3);
+      center = goRight
+        ? rightMin + Math.random() * (maxCenter - rightMin)
+        : minCenter + Math.random() * (leftMax - minCenter);
+    } else if (rightAvailable) {
+      center = rightMin + Math.random() * (maxCenter - rightMin);
+    } else if (leftAvailable) {
+      center = minCenter + Math.random() * (leftMax - minCenter);
+    } else {
+      // 최소 변화량 보장 못 함 → 전체 범위에서 랜덤
+      center = minCenter + Math.random() * (maxCenter - minCenter);
+    }
+    x = center - CLOUD_WIDTH / 2;
+  } else {
+    x = Math.random() * (CANVAS_WIDTH - CLOUD_WIDTH);
+  }
+
   const vx =
     type === 'moving'
       ? (Math.random() < 0.5 ? -1 : 1) * MOVING_CLOUD_SPEED
@@ -109,7 +159,8 @@ export function generateInitialClouds(): Cloud[] {
         (CLOUD_JUMP_CONFIG.MAX_VERTICAL_GAP -
           CLOUD_JUMP_CONFIG.MIN_VERTICAL_GAP);
     lastY -= gap;
-    clouds.push(generateCloud(lastY, 1));
+    const prevX = clouds[clouds.length - 1].x;
+    clouds.push(generateCloud(lastY, 1, prevX));
   }
 
   return clouds;
