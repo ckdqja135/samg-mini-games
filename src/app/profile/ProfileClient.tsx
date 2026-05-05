@@ -31,7 +31,7 @@ const GAME_NAMES: Record<string, string> = {
   'balloon-ride': '방글핑의 풍선 여행',
   'water-dodge': '꽁꽁핑의 물줄기 피하기',
   'cake-catch': '달콤핑의 디저트 파티',
-  'balloon-pop': '톡파핑의 풍선 펑펑',
+  'balloon-pop': '큐핑의 풍선 펑펑',
   'star-ladder': '샤샤핑의 별빛 사다리',
   'fruit-river': '새콤핑의 과일 강물',
 };

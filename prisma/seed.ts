@@ -29,7 +29,7 @@ const GAMES = [
   },
   {
     id: 'balloon-pop',
-    name: '톡파핑의 풍선 펑펑',
+    name: '큐핑의 풍선 펑펑',
     description: '다가오는 풍선을 별로 펑펑 터뜨려요!',
     thumbnail: '/asset/thumbnails/balloon-pop.png',
   },

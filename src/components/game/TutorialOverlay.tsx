@@ -56,7 +56,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'balloon-pop': {
     emoji: '🎯',
-    title: '톡파핑의 풍선 펑펑',
+    title: '큐핑의 풍선 펑펑',
     steps: [
       '캐릭터는 가운데 고정',
       '풍선이 사방에서 다가와요',

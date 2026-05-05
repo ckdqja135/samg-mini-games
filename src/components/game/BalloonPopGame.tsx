@@ -447,7 +447,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="톡파핑의 풍선 펑펑"
+          gameName="큐핑의 풍선 펑펑"
         />
         <TutorialOverlay
           gameId={gameId}
