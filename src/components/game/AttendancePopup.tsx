@@ -32,8 +32,8 @@ export function AttendancePopup() {
       <div className="relative card-cute w-full max-w-[340px] flex flex-col items-center gap-3 text-center py-6">
         <Confetti count={60} durationMs={2500} />
         <div className="text-5xl">🎉</div>
-        <h2 className="font-pixel text-xl text-primary-pink">출석 체크!</h2>
-        <p className="font-pixel text-base text-text-dark">
+        <h2 className="text-xl text-primary-pink font-bold">출석 체크!</h2>
+        <p className="text-base text-text-dark">
           {streak}일 연속 출석 중이에요
         </p>
         <p className="text-xs text-text-light">
