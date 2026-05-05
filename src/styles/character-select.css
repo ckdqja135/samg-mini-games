@@ -68,6 +68,82 @@
   }
 }
 
+.character-card.coming-soon {
+  cursor: default;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(245, 235, 250, 0.7)
+  );
+  border: 3px dashed rgba(107, 79, 140, 0.35);
+}
+
+.character-card.coming-soon:hover {
+  transform: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(245, 235, 250, 0.7)
+  );
+}
+
+.character-card.coming-soon .silhouette-wrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-card.coming-soon .silhouette {
+  width: 100%;
+  height: 100%;
+  background-color: #2a2030;
+  -webkit-mask-image: var(--silhouette-img);
+  mask-image: var(--silhouette-img);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  opacity: 0.85;
+  animation: coming-soon-float 2.4s ease-in-out infinite;
+}
+
+.character-card.coming-soon .question-mark {
+  position: absolute;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.character-card.coming-soon .coming-soon-text {
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--text-dark);
+}
+
+.character-card.coming-soon .coming-soon-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+@keyframes coming-soon-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 .selected-preview {
   text-align: center;
   background: rgba(255, 255, 255, 0.65);

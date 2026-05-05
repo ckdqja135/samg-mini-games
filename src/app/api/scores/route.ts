@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
 import {
@@ -135,6 +136,9 @@ export async function POST(request: Request) {
 
   const rank = sorted.findIndex((b) => b.userId === session.userId) + 1;
   const top5Updated = isNewRecord && rank > 0 && rank <= 5;
+
+  revalidatePath(`/games/${gameId}`);
+  revalidatePath(`/games/${gameId}/ranking`);
 
   const response: SubmitScoreResponse = {
     rank,

@@ -609,7 +609,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="구름 점프"
+          gameName="포실핑의 구름 점프"
         />
 
         <TutorialOverlay

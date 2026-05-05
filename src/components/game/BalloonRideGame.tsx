@@ -612,7 +612,7 @@ export function BalloonRideGame({
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="풍선 타기"
+          gameName="방글핑의 풍선 여행"
         />
         <TutorialOverlay
           gameId={gameId}

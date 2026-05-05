@@ -407,7 +407,7 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="물줄기 피하기"
+          gameName="꽁꽁핑의 물줄기 피하기"
         />
         <TutorialOverlay
           gameId={gameId}

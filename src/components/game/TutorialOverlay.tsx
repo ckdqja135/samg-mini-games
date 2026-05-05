@@ -12,7 +12,7 @@ export interface Tutorial {
 export const TUTORIALS: Record<string, Tutorial> = {
   'cloud-jump': {
     emoji: '☁️',
-    title: '구름 점프',
+    title: '포실핑의 구름 점프',
     steps: [
       '캐릭터가 자동으로 좌우로 이동해요',
       '탭/스페이스바 = 방향 전환',
@@ -23,7 +23,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'balloon-ride': {
     emoji: '🎈',
-    title: '풍선 타기',
+    title: '방글핑의 풍선 여행',
     steps: [
       '풍선이 중력으로 떨어져요',
       '탭/스페이스바 = 풍선 띄우기',
@@ -34,7 +34,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'water-dodge': {
     emoji: '💧',
-    title: '물줄기 피하기',
+    title: '꽁꽁핑의 물줄기 피하기',
     steps: [
       '캐릭터가 자동으로 좌우로 이동해요',
       '탭/스페이스바 = 방향 전환',
@@ -45,7 +45,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'cake-catch': {
     emoji: '🍰',
-    title: '케이크 캐치',
+    title: '달콤핑의 디저트 파티',
     steps: [
       '캐릭터가 자동으로 좌우로 이동해요',
       '탭/스페이스바 = 방향 전환',
@@ -56,7 +56,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'balloon-pop': {
     emoji: '🎯',
-    title: '하늘 풍선 펑',
+    title: '톡파핑의 풍선 펑펑',
     steps: [
       '캐릭터는 가운데 고정',
       '풍선이 사방에서 다가와요',
@@ -67,7 +67,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'star-ladder': {
     emoji: '🪜',
-    title: '별빛 사다리',
+    title: '샤샤핑의 별빛 사다리',
     steps: [
       '두 사다리 중 한 곳에서 등반',
       '탭/스페이스바 = 좌우 사다리 전환',
@@ -78,7 +78,7 @@ export const TUTORIALS: Record<string, Tutorial> = {
   },
   'fruit-river': {
     emoji: '🌊',
-    title: '과일 흐름타기',
+    title: '새콤핑의 과일 강물',
     steps: [
       '강물에서 보드를 타고 자동 전진',
       '탭/스페이스바 = 점프',

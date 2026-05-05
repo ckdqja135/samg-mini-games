@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CharacterSprite } from '@/components/character/CharacterSprite';
 import { CuteButton } from '@/components/ui/CuteButton';
 import { CountUp } from '@/components/ui/CountUp';
@@ -29,6 +30,7 @@ type SubmitState =
   | { status: 'error'; message: string };
 
 export function ResultClient({ gameId, gameName }: ResultClientProps) {
+  const router = useRouter();
   const [result, setResult] = useState<GameOverResult | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [submit, setSubmit] = useState<SubmitState>({ status: 'idle' });
@@ -104,6 +106,9 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
           setRanking(rankingData);
         }
 
+        // 라우터 캐시 무효화 — 캐릭터 선택/랭킹 페이지로 돌아갈 때 최신 랭킹 반영
+        router.refresh();
+
         // 등록한 결과는 1회성이므로 sessionStorage에서 제거
         try {
           sessionStorage.removeItem(`samg:lastResult:${gameId}`);
@@ -124,7 +129,7 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [result, submit.status, gameId]);
+  }, [result, submit.status, gameId, router]);
 
   if (!loaded) {
     return (

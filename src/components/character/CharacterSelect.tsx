@@ -13,14 +13,23 @@ import { TUTORIALS } from '@/components/game/TutorialOverlay';
 import { CharacterSprite } from './CharacterSprite';
 import { CuteButton } from '@/components/ui/CuteButton';
 import { SparkleEffect } from '@/components/ui/SparkleEffect';
+import { RankingList } from '@/components/game/RankingList';
 import { useGamePlayStore } from '@/store/gameStore';
+import type { RankingEntry } from '@/types/score';
 
 interface CharacterSelectProps {
   gameId: string;
   gameName: string;
+  topRanking?: RankingEntry[];
+  myUserId?: string;
 }
 
-export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
+export function CharacterSelect({
+  gameId,
+  gameName,
+  topRanking = [],
+  myUserId,
+}: CharacterSelectProps) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState(CHARACTER_SPRITES[0].id);
   const setStoreCharacter = useGamePlayStore((s) => s.setCharacter);
@@ -103,6 +112,28 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
         );
       })()}
 
+      <div className="mx-2 px-4 py-3 rounded-cute-lg bg-white/95 border-2 border-primary-pink/30">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">🏆</span>
+            <h3 className="font-sans font-bold text-sm text-text-dark tracking-tight">
+              TOP 5 랭킹
+            </h3>
+          </div>
+          <Link
+            href={`/games/${gameId}/ranking`}
+            className="text-[11px] font-sans font-semibold text-primary-pink hover:underline"
+          >
+            전체보기 →
+          </Link>
+        </div>
+        <RankingList
+          ranking={topRanking}
+          myUserId={myUserId}
+          emptyMessage="이 게임의 첫 1위를 노려봐요! ✨"
+        />
+      </div>
+
       <div className="character-grid px-2">
         {CHARACTER_SPRITES.map((char) => {
           const charAbility = CHARACTER_ABILITIES[char.id];
@@ -132,6 +163,27 @@ export function CharacterSelect({ gameId, gameName }: CharacterSelectProps) {
             </button>
           );
         })}
+        <div
+          className="character-card coming-soon"
+          aria-label="다음 캐릭터 준비중"
+          title="다음 캐릭터는 뭐가 출시될까요? 기대해주세요!"
+        >
+          <div className="silhouette-wrap">
+            <div
+              className="silhouette"
+              style={{
+                ['--silhouette-img' as string]: `url(${CHARACTER_SPRITES[0].imageUrl})`,
+              } as CSSProperties}
+              aria-hidden
+            />
+            <span className="question-mark" aria-hidden>?</span>
+          </div>
+          <span className="char-name coming-soon-text">
+            다음 캐릭터는?
+            <br />
+            <span className="coming-soon-sub">기대해주세요!</span>
+          </span>
+        </div>
       </div>
 
       <div

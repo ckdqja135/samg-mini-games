@@ -435,7 +435,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="과일 흐름타기"
+          gameName="새콤핑의 과일 강물"
         />
         <TutorialOverlay
           gameId={gameId}

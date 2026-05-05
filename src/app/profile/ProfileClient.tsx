@@ -27,13 +27,13 @@ interface ProfileData {
 }
 
 const GAME_NAMES: Record<string, string> = {
-  'cloud-jump': '구름 점프',
-  'balloon-ride': '풍선 타기',
-  'water-dodge': '물줄기 피하기',
-  'cake-catch': '케이크 캐치',
-  'balloon-pop': '하늘 풍선 펑',
-  'star-ladder': '별빛 사다리',
-  'fruit-river': '과일 흐름타기',
+  'cloud-jump': '포실핑의 구름 점프',
+  'balloon-ride': '방글핑의 풍선 여행',
+  'water-dodge': '꽁꽁핑의 물줄기 피하기',
+  'cake-catch': '달콤핑의 디저트 파티',
+  'balloon-pop': '톡파핑의 풍선 펑펑',
+  'star-ladder': '샤샤핑의 별빛 사다리',
+  'fruit-river': '새콤핑의 과일 강물',
 };
 
 export function ProfileClient() {

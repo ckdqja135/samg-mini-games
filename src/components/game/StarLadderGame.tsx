@@ -383,7 +383,7 @@ export function StarLadderGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="별빛 사다리"
+          gameName="샤샤핑의 별빛 사다리"
         />
         <TutorialOverlay
           gameId={gameId}

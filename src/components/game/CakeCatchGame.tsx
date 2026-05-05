@@ -440,7 +440,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
             pausedRef.current = false;
             setPaused(false);
           }}
-          gameName="케이크 캐치"
+          gameName="달콤핑의 디저트 파티"
         />
         <TutorialOverlay
           gameId={gameId}
