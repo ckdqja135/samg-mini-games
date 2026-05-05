@@ -42,7 +42,7 @@ export function RankingList({
             key={`${entry.rank}-${entry.userId}`}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-cute
-              font-pixel text-sm
+              text-sm font-semibold
               ${
                 entry.rank === 1
                   ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 border border-yellow-300'

@@ -122,12 +122,12 @@ export function TutorialOverlay({ gameId, onShow, onDismiss }: TutorialOverlayPr
     >
       <div className="card-cute w-[85%] max-w-[340px] flex flex-col gap-3 text-center">
         <div className="text-5xl">{t.emoji}</div>
-        <h2 className="font-pixel text-xl text-primary-pink">{t.title}</h2>
+        <h2 className="text-xl text-primary-pink font-bold">{t.title}</h2>
         <ul className="flex flex-col gap-2 text-left">
           {t.steps.map((s, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 text-sm text-text-dark font-pixel"
+              className="flex items-start gap-2 text-sm text-text-dark"
             >
               <span className="text-primary-pink">{i + 1}.</span>
               <span>{s}</span>
