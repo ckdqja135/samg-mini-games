@@ -1,10 +1,10 @@
 import type { Cloud, CloudType, Fruit, FruitType } from '@/types/cloudJump';
 
 export const CLOUD_JUMP_CONFIG = {
-  GRAVITY: 0.13,
-  JUMP_POWER: -6.5,
-  TRAMPOLINE_POWER: -10.3,
-  MOVE_SPEED: 1.7,
+  GRAVITY: 0.10,
+  JUMP_POWER: -5.7,
+  TRAMPOLINE_POWER: -9.0,
+  MOVE_SPEED: 1.4,
   CANVAS_WIDTH: 375,
   CANVAS_HEIGHT: 700,
   PLAYER_HEIGHT: 64,
