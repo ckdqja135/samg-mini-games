@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PWARegister } from '@/components/layout/PWARegister';
+import { RouteProgress } from '@/components/layout/RouteProgress';
 
 export const metadata: Metadata = {
   title: '마이핑 컴패니언 미니게임',
@@ -37,6 +38,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <RouteProgress />
         {children}
         <PWARegister />
       </body>
