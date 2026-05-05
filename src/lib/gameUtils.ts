@@ -38,7 +38,7 @@ export function randRange(min: number, max: number): number {
 export function pickWeighted<T extends string>(
   defs: Record<T, { weight: number }>
 ): T {
-  const total = Object.values(defs).reduce(
+  const total = Object.values(defs).reduce<number>(
     (s, d) => s + (d as { weight: number }).weight,
     0
   );
