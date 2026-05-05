@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma *)",
+      "Bash(npx tsc *)",
+      "Bash(npx tsx *)",
+      "Bash(node -e \"const{PrismaClient}=require\\('@prisma/client'\\);const p=new PrismaClient\\(\\);p.game.findMany\\(\\).then\\(g=>{console.log\\(JSON.stringify\\(g,null,2\\)\\);process.exit\\(0\\)}\\).catch\\(e=>{console.error\\(e\\);process.exit\\(1\\)}\\)\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
