@@ -22,11 +22,14 @@ export function ShareButton({ gameName, score, characterName, url }: ShareButton
     const text = buildText();
     const shareUrl =
       url || (typeof window !== 'undefined' ? window.location.origin : '');
-    const data = { title: '마이핑 컴패니언 미니게임', text, url: shareUrl };
+    const fullText = `${text}\n${shareUrl}`;
 
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
-        await navigator.share(data);
+        await navigator.share({
+          title: '마이핑 컴패니언 미니게임',
+          text: fullText,
+        });
         setFeedback(null);
         return;
       } catch {
@@ -36,7 +39,7 @@ export function ShareButton({ gameName, score, characterName, url }: ShareButton
 
     // 클립보드 폴백
     try {
-      await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
+      await navigator.clipboard.writeText(fullText);
       setFeedback('클립보드에 복사됐어요');
     } catch {
       setFeedback('공유에 실패했어요');
