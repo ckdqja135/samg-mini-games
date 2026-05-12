@@ -4,7 +4,7 @@ export const CLOUD_JUMP_CONFIG = {
   GRAVITY: 0.10,
   JUMP_POWER: -5.7,
   TRAMPOLINE_POWER: -9.0,
-  MOVE_SPEED: 1.4,
+  MOVE_SPEED: 1.75,
   CANVAS_WIDTH: 375,
   CANVAS_HEIGHT: 700,
   PLAYER_HEIGHT: 64,
@@ -15,7 +15,7 @@ export const CLOUD_JUMP_CONFIG = {
   MAX_VERTICAL_GAP: 88,
   MAX_HORIZ_REACH: 130,
   MIN_HORIZ_CHANGE: 50,
-  MOVING_CLOUD_SPEED: 0.75,
+  MOVING_CLOUD_SPEED: 1.05,
   FRUIT_SIZE: 28,
   FRUIT_SPAWN_CHANCE: 0.35,
 };
@@ -38,15 +38,18 @@ export function pickCloudType(level: number): CloudType {
     return r < 0.85 ? 'normal' : 'trampoline';
   }
   if (level === 2) {
-    if (r < 0.6) return 'normal';
-    if (r < 0.78) return 'trampoline';
-    if (r < 0.92) return 'breakable';
+    // 레벨 2부터 movingcloud 등장 — 난이도 완만한 상승
+    if (r < 0.55) return 'normal';
+    if (r < 0.72) return 'trampoline';
+    if (r < 0.85) return 'breakable';
+    if (r < 0.94) return 'moving';
     return 'star';
   }
-  if (r < 0.45) return 'normal';
-  if (r < 0.62) return 'trampoline';
-  if (r < 0.78) return 'breakable';
-  if (r < 0.9) return 'moving';
+  // 레벨 3+ — moving 비율 ↑, breakable 비율 ↑
+  if (r < 0.4) return 'normal';
+  if (r < 0.55) return 'trampoline';
+  if (r < 0.72) return 'breakable';
+  if (r < 0.92) return 'moving';
   return 'star';
 }
 
@@ -237,7 +240,7 @@ export function maybeGenerateFruit(cloud: Cloud): Fruit | null {
 export function levelFromHeight(highestY: number): number {
   // y가 작아질수록 높이 ↑. 시작 0 기준
   const ascended = -highestY;
-  if (ascended < 900) return 1;
-  if (ascended < 2400) return 2;
+  if (ascended < 600) return 1;
+  if (ascended < 1600) return 2;
   return 3;
 }

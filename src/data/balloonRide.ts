@@ -10,20 +10,20 @@ export const BALLOON_RIDE_CONFIG = {
 
   GRAVITY: 0.09,
   PUFF_VELOCITY: -3.6,
-  MAX_FALL_SPEED: 3.2,
+  MAX_FALL_SPEED: 3.6,
 
   PLAYER_X: 92,
   PLAYER_WIDTH: 44,
   PLAYER_HEIGHT: 60,
 
-  BASE_SCROLL_SPEED: 1.7,
-  MAX_SCROLL_SPEED: 3.2,
+  BASE_SCROLL_SPEED: 2.1,
+  MAX_SCROLL_SPEED: 4.0,
 
   WALL_WIDTH: 56,
-  BASE_WALL_GAP: 220,
-  MIN_WALL_GAP: 140,
-  BASE_WALL_SPACING: 240,
-  MIN_WALL_SPACING: 180,
+  BASE_WALL_GAP: 190,
+  MIN_WALL_GAP: 120,
+  BASE_WALL_SPACING: 205,
+  MIN_WALL_SPACING: 150,
 
   ITEM_SIZE: 28,
   ITEM_SPAWN_CHANCE: 0.55,
@@ -79,9 +79,9 @@ export function resetCounters() {
 }
 
 export function levelFromDistance(distance: number): number {
-  if (distance < 60) return 1;
-  if (distance < 180) return 2;
-  if (distance < 360) return 3;
+  if (distance < 40) return 1;
+  if (distance < 120) return 2;
+  if (distance < 240) return 3;
   return 4;
 }
 
