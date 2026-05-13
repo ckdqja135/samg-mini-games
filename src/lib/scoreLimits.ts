@@ -1,3 +1,25 @@
+/** 게임별 최소 플레이 시간 (ms) — 이보다 짧으면 비정상. */
+export const PER_GAME_MIN_DURATION_MS: Record<string, number> = {
+  'cloud-jump': 3_000,
+  'balloon-ride': 3_000,
+  'water-dodge': 3_000,
+  'cake-catch': 3_000,
+  'balloon-pop': 3_000,
+  'star-ladder': 3_000,
+  'fruit-river': 3_000,
+};
+
+/** 게임별 최대 플레이 시간 (ms) — 토큰 만료 외 추가 가드. */
+export const PER_GAME_MAX_DURATION_MS: Record<string, number> = {
+  'cloud-jump': 20 * 60_000,
+  'balloon-ride': 20 * 60_000,
+  'water-dodge': 20 * 60_000,
+  'cake-catch': 20 * 60_000,
+  'balloon-pop': 20 * 60_000,
+  'star-ladder': 20 * 60_000,
+  'fruit-river': 20 * 60_000,
+};
+
 /** 게임별 max 합리적 점수 (이상값 차단). 어드민 통계로 추후 보정. */
 export const PER_GAME_MAX_SCORE: Record<string, number> = {
   'cloud-jump': 200_000,

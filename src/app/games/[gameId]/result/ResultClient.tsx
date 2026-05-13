@@ -56,6 +56,14 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
 
     const submitScore = async () => {
       try {
+        // 세션 토큰이 없으면 서버 검증 불가 — 사용자에게 안내하고 종료
+        if (!result.sessionToken) {
+          setSubmit({
+            status: 'error',
+            message: '세션이 만료되어 점수를 등록할 수 없어요. 다시 시도해주세요.',
+          });
+          return;
+        }
         const [submitRes, meRes] = await Promise.all([
           fetch('/api/scores', {
             method: 'POST',
@@ -66,7 +74,10 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
               score: result.score,
               maxCombo: result.maxCombo,
               abilityActivations: result.abilityActivations,
-              durationMs: result.durationMs,
+              sessionToken: result.sessionToken,
+              events: result.events,
+              untrustedInputs: result.untrustedInputs,
+              totalInputs: result.totalInputs,
             }),
           }),
           fetch('/api/auth/me', { cache: 'no-store' }),

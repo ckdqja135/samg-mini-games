@@ -105,6 +105,7 @@ export function BalloonRideGame({
   const addScore = useGamePlayStore((s) => s.addScore);
   const resetGame = useGamePlayStore((s) => s.resetGame);
   const setCharacter = useGamePlayStore((s) => s.setCharacter);
+  const startSession = useGamePlayStore((s) => s.startSession);
 
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
@@ -118,6 +119,7 @@ export function BalloonRideGame({
   useEffect(() => {
     setCharacter(characterId);
     resetGame();
+    void startSession(gameId, characterId);
 
     const renderer = new CharacterRenderer();
     rendererRef.current = renderer;
@@ -136,7 +138,7 @@ export function BalloonRideGame({
       window.removeEventListener('pointerdown', wakeAudio);
       window.removeEventListener('keydown', wakeAudio);
     };
-  }, [characterId, resetGame, setCharacter]);
+  }, [characterId, gameId, resetGame, setCharacter, startSession]);
 
   useEffect(() => {
     if (!ready) return;
@@ -181,6 +183,10 @@ export function BalloonRideGame({
         maxCombo: store.maxCombo,
         abilityActivations: store.abilityActivations,
         durationMs: performance.now() - startedAtRef.current,
+        sessionToken: store.sessionToken,
+        events: store.scoreEvents,
+        untrustedInputs: store.untrustedInputs,
+        totalInputs: store.totalInputs,
       };
       try {
         sessionStorage.setItem(

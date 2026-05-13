@@ -88,6 +88,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
   const addScore = useGamePlayStore((s) => s.addScore);
   const resetGame = useGamePlayStore((s) => s.resetGame);
   const setCharacter = useGamePlayStore((s) => s.setCharacter);
+  const startSession = useGamePlayStore((s) => s.startSession);
 
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
@@ -99,6 +100,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
   useEffect(() => {
     setCharacter(characterId);
     resetGame();
+    void startSession(gameId, characterId);
     const r = new CharacterRenderer();
     rendererRef.current = r;
     r.preload().then(() => setReady(true)).catch(() => setReady(true));
@@ -110,7 +112,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
       window.removeEventListener('pointerdown', wakeAudio);
       window.removeEventListener('keydown', wakeAudio);
     };
-  }, [characterId, resetGame, setCharacter]);
+  }, [characterId, gameId, resetGame, setCharacter, startSession]);
 
   useEffect(() => {
     if (!ready || countdown === null || tutorialOpen) return;
@@ -147,6 +149,10 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
         maxCombo: store.maxCombo,
         abilityActivations: store.abilityActivations,
         durationMs: performance.now() - startedAtRef.current,
+        sessionToken: store.sessionToken,
+        events: store.scoreEvents,
+        untrustedInputs: store.untrustedInputs,
+        totalInputs: store.totalInputs,
       };
       try {
         sessionStorage.setItem(`samg:lastResult:${gameId}`, JSON.stringify(result));

@@ -55,4 +55,8 @@ export interface GameOverResult {
   characterId: string;
   gameId: string;
   durationMs: number;
+  sessionToken: string | null;
+  events: Array<{ t: number; k: 'p' | 's' | 'b'; v: number }>;
+  untrustedInputs: number;
+  totalInputs: number;
 }

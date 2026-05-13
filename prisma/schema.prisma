@@ -20,6 +20,7 @@ model User {
   scores      Score[]
   challenges  DailyChallenge[]
   attendances Attendance[]
+  sessions    GameSession[]
 }
 
 model Game {
@@ -30,6 +31,7 @@ model Game {
   isActive    Boolean  @default(true)
 
   scores      Score[]
+  sessions    GameSession[]
 }
 
 model Score {
@@ -41,12 +43,34 @@ model Score {
   maxCombo           Int      @default(0)
   abilityActivations Int      @default(0)
   playedAt           DateTime @default(now())
+  // 세션 토큰으로 만들어진 점수만 sessionId가 채워짐. 과거 데이터 호환을 위해 optional.
+  sessionId          String?  @unique
 
-  user               User     @relation(fields: [userId], references: [id])
-  game               Game     @relation(fields: [gameId], references: [id])
+  user               User         @relation(fields: [userId], references: [id])
+  game               Game         @relation(fields: [gameId], references: [id])
+  session            GameSession? @relation(fields: [sessionId], references: [id])
 
   @@index([gameId, score])
   @@index([userId, playedAt])
+}
+
+/// 한 판의 게임 플레이를 추적. 시작 시 발급된 HMAC 토큰과 매칭되어야 점수 등록 가능.
+model GameSession {
+  id          String    @id @default(cuid())
+  userId      String
+  gameId      String
+  characterId String
+  nonce       String    // HMAC 서명에 포함되는 random salt
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  status      String    @default("active") // active | submitted | expired | rejected
+
+  user        User      @relation(fields: [userId], references: [id])
+  game        Game      @relation(fields: [gameId], references: [id])
+  score       Score?
+
+  @@index([userId, gameId, startedAt])
+  @@index([status, startedAt])
 }
 
 model DailyChallenge {

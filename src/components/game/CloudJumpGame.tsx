@@ -106,6 +106,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
   const addScore = useGamePlayStore((s) => s.addScore);
   const resetGame = useGamePlayStore((s) => s.resetGame);
   const setCharacter = useGamePlayStore((s) => s.setCharacter);
+  const startSession = useGamePlayStore((s) => s.startSession);
 
   const [hudLevel, setHudLevel] = useState(1);
   const [ready, setReady] = useState(false);
@@ -120,6 +121,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
   useEffect(() => {
     setCharacter(characterId);
     resetGame();
+    void startSession(gameId, characterId);
 
     const renderer = new CharacterRenderer();
     rendererRef.current = renderer;
@@ -140,7 +142,7 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
       window.removeEventListener('pointerdown', wakeAudio);
       window.removeEventListener('keydown', wakeAudio);
     };
-  }, [characterId, resetGame, setCharacter]);
+  }, [characterId, gameId, resetGame, setCharacter, startSession]);
 
   // 카운트다운
   useEffect(() => {
@@ -186,6 +188,10 @@ export function CloudJumpGame({ gameId, characterId }: CloudJumpGameProps) {
         maxCombo: store.maxCombo,
         abilityActivations: store.abilityActivations,
         durationMs: performance.now() - startedAtRef.current,
+        sessionToken: store.sessionToken,
+        events: store.scoreEvents,
+        untrustedInputs: store.untrustedInputs,
+        totalInputs: store.totalInputs,
       };
 
       try {

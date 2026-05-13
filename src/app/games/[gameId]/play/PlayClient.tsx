@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGamePlayStore } from '@/store/gameStore';
 import { CloudJumpGame } from '@/components/game/CloudJumpGame';
@@ -30,10 +30,29 @@ const SUPPORTED_GAMES = new Set([
 export function PlayClient({ gameId, gameName }: PlayClientProps) {
   const router = useRouter();
   const selectedCharacter = useGamePlayStore((s) => s.selectedCharacter);
+  const recordInput = useGamePlayStore((s) => s.recordInput);
   const [mounted, setMounted] = useState(false);
+  const recordInputRef = useRef(recordInput);
+  recordInputRef.current = recordInput;
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // 게임 화면 전체에서 isTrusted 비율 추적 — 익스텐션 합성 클릭 탐지
+  useEffect(() => {
+    const onPointer = (e: PointerEvent) => {
+      recordInputRef.current(e.isTrusted);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      recordInputRef.current(e.isTrusted);
+    };
+    window.addEventListener('pointerdown', onPointer, { capture: true });
+    window.addEventListener('keydown', onKey, { capture: true });
+    return () => {
+      window.removeEventListener('pointerdown', onPointer, { capture: true });
+      window.removeEventListener('keydown', onKey, { capture: true });
+    };
   }, []);
 
   if (!mounted) {
