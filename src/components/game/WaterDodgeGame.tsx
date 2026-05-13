@@ -25,11 +25,11 @@ const CFG = {
   GROUND_Y: 610,
   PLAYER_W: 44,
   PLAYER_H: 60,
-  WALK_SPEED: 1.6,
+  WALK_SPEED: 1.8,
   ITEM_LIFE_FRAMES: 480, // 약 8초간 바닥에 머무름
-  SPRAY_BASE_INTERVAL: 65,
-  SPRAY_MIN_INTERVAL: 28,
-  SPRAY_FALL_SPEED: 4.5,
+  SPRAY_BASE_INTERVAL: 55,
+  SPRAY_MIN_INTERVAL: 20,
+  SPRAY_FALL_SPEED: 5.6,
   ITEM_INTERVAL: 200,
   ITEM_SIZE: 28,
 };
@@ -185,11 +185,11 @@ export function WaterDodgeGame({ gameId, characterId }: Props) {
           x: randRange(0, CFG.W - w),
           y: -randRange(20, 80),
           width: w,
-          speed: CFG.SPRAY_FALL_SPEED + s.level * 0.4,
+          speed: CFG.SPRAY_FALL_SPEED + s.level * 0.64,
         });
         const interval = Math.max(
           CFG.SPRAY_MIN_INTERVAL,
-          CFG.SPRAY_BASE_INTERVAL - s.level * 6
+          CFG.SPRAY_BASE_INTERVAL - s.level * 10
         );
         s.nextSpraySpawn = interval + Math.floor(Math.random() * 20);
       }

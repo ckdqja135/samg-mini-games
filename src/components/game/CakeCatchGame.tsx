@@ -25,16 +25,16 @@ const CFG = {
   GROUND_Y: 610,
   PLAYER_W: 50,
   PLAYER_H: 60,
-  WALK_SPEED: 1.3,
-  DROP_INTERVAL_BASE: 90,
-  DROP_INTERVAL_MIN: 50,
-  DROP_FALL_BASE: 1.6,
-  DROP_FALL_MAX: 2.8,
+  WALK_SPEED: 1.5,
+  DROP_INTERVAL_BASE: 75,
+  DROP_INTERVAL_MIN: 38,
+  DROP_FALL_BASE: 2.0,
+  DROP_FALL_MAX: 3.5,
   ITEM_SIZE: 32,
   FRUIT_SIZE: 28,
-  FRUIT_SPAWN_INTERVAL: 320,
-  FRUIT_FALL_BASE: 1.3,
-  FRUIT_FALL_MAX: 2.2,
+  FRUIT_SPAWN_INTERVAL: 280,
+  FRUIT_FALL_BASE: 1.6,
+  FRUIT_FALL_MAX: 2.75,
 };
 
 const FALLING_DEFS = {
@@ -199,13 +199,13 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
           id: nextId(),
           x: randRange(20, CFG.W - 20 - CFG.ITEM_SIZE),
           y: -CFG.ITEM_SIZE,
-          vy: randRange(CFG.DROP_FALL_BASE, CFG.DROP_FALL_MAX) + s.level * 0.15,
+          vy: randRange(CFG.DROP_FALL_BASE, CFG.DROP_FALL_MAX) + s.level * 0.24,
           type,
           caught: false,
         });
         const interval = Math.max(
           CFG.DROP_INTERVAL_MIN,
-          CFG.DROP_INTERVAL_BASE - s.level * 5
+          CFG.DROP_INTERVAL_BASE - s.level * 8
         );
         s.nextSpawn = interval + Math.floor(Math.random() * 16);
       }
@@ -251,7 +251,7 @@ export function CakeCatchGame({ gameId, characterId }: Props) {
           id: nextId(),
           x: randRange(12, CFG.W - 12 - CFG.FRUIT_SIZE),
           y: -CFG.FRUIT_SIZE,
-          vy: randRange(CFG.FRUIT_FALL_BASE, CFG.FRUIT_FALL_MAX) + s.level * 0.12,
+          vy: randRange(CFG.FRUIT_FALL_BASE, CFG.FRUIT_FALL_MAX) + s.level * 0.19,
           type,
           collected: false,
         });

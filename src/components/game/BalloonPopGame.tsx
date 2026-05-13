@@ -26,12 +26,12 @@ const CFG = {
   PLAYER_Y: 700 / 2,
   PLAYER_SAFE_R: 38,
   BALLOON_R: 22,
-  BALLOON_BASE_SPEED: 0.7,
-  BALLOON_MAX_SPEED: 1.8,
+  BALLOON_BASE_SPEED: 0.9,
+  BALLOON_MAX_SPEED: 2.3,
   STAR_SPEED: 9,
   STAR_RADIUS: 12,
-  SPAWN_INTERVAL_BASE: 60,
-  SPAWN_INTERVAL_MIN: 22,
+  SPAWN_INTERVAL_BASE: 50,
+  SPAWN_INTERVAL_MIN: 16,
   FIRE_COOLDOWN_MS: 120,
 };
 
@@ -180,7 +180,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
       const len = Math.sqrt(dx * dx + dy * dy);
       const speed = Math.min(
         CFG.BALLOON_MAX_SPEED,
-        CFG.BALLOON_BASE_SPEED + level * 0.2
+        CFG.BALLOON_BASE_SPEED + level * 0.32
       );
       stateRef.current.balloons.push({
         id: nextId(),
@@ -208,7 +208,7 @@ export function BalloonPopGame({ gameId, characterId }: Props) {
         spawnBalloon(s.level);
         const interval = Math.max(
           CFG.SPAWN_INTERVAL_MIN,
-          CFG.SPAWN_INTERVAL_BASE - s.level * 6
+          CFG.SPAWN_INTERVAL_BASE - s.level * 10
         );
         s.nextSpawn = interval + Math.floor(Math.random() * 16);
       }

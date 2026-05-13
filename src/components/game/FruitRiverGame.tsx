@@ -30,13 +30,13 @@ const CFG = {
   PLAYER_GROUND_Y: 570,
   JUMP_VY: -8.4,
   GRAVITY: 0.32,
-  SCROLL_BASE: 1.7,
-  SCROLL_MAX: 3.0,
+  SCROLL_BASE: 2.1,
+  SCROLL_MAX: 3.8,
   ITEM_SIZE: 30,
   ROCK_W: 30,
   ROCK_H: 22,
-  SPAWN_INTERVAL_BASE: 80,
-  SPAWN_INTERVAL_MIN: 50,
+  SPAWN_INTERVAL_BASE: 65,
+  SPAWN_INTERVAL_MIN: 35,
 };
 
 const ITEM_DEFS = {
@@ -209,7 +209,7 @@ export function FruitRiverGame({ gameId, characterId }: Props) {
         }
         const interval = Math.max(
           CFG.SPAWN_INTERVAL_MIN,
-          CFG.SPAWN_INTERVAL_BASE - s.level * 5
+          CFG.SPAWN_INTERVAL_BASE - s.level * 8
         );
         s.nextSpawn = interval + Math.floor(Math.random() * 25);
       }
