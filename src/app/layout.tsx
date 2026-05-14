@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { DevToolsGuard } from '@/components/layout/DevToolsGuard';
 import { PWARegister } from '@/components/layout/PWARegister';
 import { RouteProgress } from '@/components/layout/RouteProgress';
 
@@ -38,6 +39,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <DevToolsGuard />
         <RouteProgress />
         {children}
         <PWARegister />
