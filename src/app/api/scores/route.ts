@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     events,
     untrustedInputs,
     totalInputs,
+    automationFlags,
   } = body;
 
   if (
@@ -63,6 +64,15 @@ export async function POST(request: Request) {
     typeof totalInputs !== 'number'
   ) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+  }
+
+  // 자동화 플래그 — navigator.webdriver = true 면 거부
+  // (Selenium/Puppeteer 등 초보 자동화. stealth 우회 가능하지만 무료 허들)
+  if (automationFlags && automationFlags.webdriver === true) {
+    return NextResponse.json(
+      { error: '자동화 환경이 감지되었습니다' },
+      { status: 400 }
+    );
   }
 
   if (

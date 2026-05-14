@@ -78,6 +78,11 @@ export function ResultClient({ gameId, gameName }: ResultClientProps) {
               events: result.events,
               untrustedInputs: result.untrustedInputs,
               totalInputs: result.totalInputs,
+              automationFlags: {
+                webdriver:
+                  typeof navigator !== 'undefined' &&
+                  navigator.webdriver === true,
+              },
             }),
           }),
           fetch('/api/auth/me', { cache: 'no-store' }),

@@ -34,6 +34,11 @@ export interface SubmitScoreRequest {
   untrustedInputs: number;
   /** 전체 입력 개수 (canvas/window pointer/key) */
   totalInputs: number;
+  /** 클라이언트 자동화 플래그 — 누락 시 미지원 환경으로 간주(허용). */
+  automationFlags?: {
+    /** navigator.webdriver — Selenium/Puppeteer 등 자동화 시 true */
+    webdriver: boolean;
+  };
 }
 
 export interface SubmitScoreResponse {
