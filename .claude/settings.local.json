@@ -9,7 +9,8 @@
       "Bash(node -e ' *)",
       "Bash(node *)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell($bytes = New-Object byte[] 48; [System.Security.Cryptography.RandomNumberGenerator]::Create\\(\\).GetBytes\\($bytes\\); [Convert]::ToBase64String\\($bytes\\))"
     ]
   }
 }
